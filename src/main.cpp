@@ -1,14 +1,38 @@
+#include "task_controller.hpp"
+
 #include <Sbus2Reciever.hpp>
 
 #include <Arduino.h>
 #include <M5Unified.h>
 
 Sbus2Reciever sbus2;
-TimerHandle_t thand_parse_sbus2;
+std::array<RtosTaskConfigRawPtr, 2> task_configs;
+
 
 void task_parse_sbus2(void *param)
 {
     sbus2.parse();
+}
+
+void task_draw_display(void *param)
+{
+    Serial.printf(
+        "1:%5d, 2:%5d, 3:%5d, 4:%5d, 5:%5d, 6:%5d, "
+        "7:%5d, 8:%5d, 9:%5d,10:%5d, "
+        "fs:%1d, lf:%1d\r\n",
+        sbus2.getChannel(0),
+        sbus2.getChannel(1),
+        sbus2.getChannel(2),
+        sbus2.getChannel(3),
+        sbus2.getChannel(4),
+        sbus2.getChannel(5),
+        sbus2.getChannel(6),
+        sbus2.getChannel(7),
+        sbus2.getChannel(8),
+        sbus2.getChannel(9),
+        sbus2.isFailsafe(),
+        sbus2.isLostframe()
+    );
 }
 
 
@@ -33,39 +57,31 @@ void setup() {
         while(1);
     };
 
-    thand_parse_sbus2 = xTimerCreate(
-        "TASK_PARSE_SBUS2",
-        pdMS_TO_TICKS(10),  /* T=15msで受信するので、それよりも早く */
-        pdTRUE,
+
+    task_configs[0] = new RtosTaskConfig_typedef{
+        "task_parse_sbus2",
         NULL,
+        pdTRUE,
+        pdMS_TO_TICKS(10),
+        pdMS_TO_TICKS(0),
         task_parse_sbus2
-    );
+    };
+    task_configs[1] = new RtosTaskConfig_typedef{
+        "task_draw_display",
+        NULL,
+        pdTRUE,
+        pdMS_TO_TICKS(100),
+        pdMS_TO_TICKS(0),
+        task_draw_display
+    };
 
-    xTimerStart(thand_parse_sbus2, 0);
+    task_initialize(task_configs.data(), task_configs.size());
+    task_start(task_configs.data(), task_configs.size());
 
-    // set default font size.
-    M5.Display.clearDisplay();
-    M5.Display.setCursor(0, 0);
     M5.Display.print("started\n");
 }
 
 void loop() {
-    Serial.printf(
-        "1:%5d, 2:%5d, 3:%5d, 4:%5d, 5:%5d, 6:%5d, "
-        "7:%5d, 8:%5d, 9:%5d,10:%5d, "
-        "fs:%1d, lf:%1d\r\n",
-        sbus2.getChannel(0),
-        sbus2.getChannel(1),
-        sbus2.getChannel(2),
-        sbus2.getChannel(3),
-        sbus2.getChannel(4),
-        sbus2.getChannel(5),
-        sbus2.getChannel(6),
-        sbus2.getChannel(7),
-        sbus2.getChannel(8),
-        sbus2.getChannel(9),
-        sbus2.isFailsafe(),
-        sbus2.isLostframe()
-    );
-    vTaskDelay(pdMS_TO_TICKS(20));
+    // nothing to do.
+    vTaskDelay(1000);
 }
