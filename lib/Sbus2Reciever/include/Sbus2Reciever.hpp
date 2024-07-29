@@ -22,8 +22,8 @@ private:
     int16_t _recieved[SBUS2_CHANNELS];
     uint8_t _recieve_buf[SBUS2_DATA_SIZE];
     uint8_t _parse_counter = 0;
-    bool _failsafe = false;
-    bool _lostframe = false;
+    bool _failsafe = true;
+    bool _lostframe = true;
     SemaphoreHandle_t _sem;
 
     bool _parseOnce();
