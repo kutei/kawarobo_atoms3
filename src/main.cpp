@@ -4,9 +4,9 @@
 #include <M5Unified.h>
 
 Sbus2Reciever sbus2;
-TimerHandle_t thand_recv_sbus2;
+TimerHandle_t thand_parse_sbus2;
 
-void timer_handler_recv_sbus2(void *param)
+void task_parse_sbus2(void *param)
 {
     sbus2.parse();
 }
@@ -33,15 +33,15 @@ void setup() {
         while(1);
     };
 
-    thand_recv_sbus2 = xTimerCreate(
-        "TIM_RECV_SBUS2",
+    thand_parse_sbus2 = xTimerCreate(
+        "TASK_PARSE_SBUS2",
         pdMS_TO_TICKS(10),  /* T=15msで受信するので、それよりも早く */
         pdTRUE,
         NULL,
-        timer_handler_recv_sbus2
+        task_parse_sbus2
     );
 
-    xTimerStart( thand_recv_sbus2, 0 );
+    xTimerStart(thand_parse_sbus2, 0);
 
     // set default font size.
     M5.Display.clearDisplay();
