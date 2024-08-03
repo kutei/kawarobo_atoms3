@@ -1,41 +1,50 @@
 #include "task_controller.hpp"
+#include "pwm_out.hpp"
 
 #include <Sbus2Reciever.hpp>
 
 #include <Arduino.h>
 #include <M5Unified.h>
 
+/**********************************************************************
+ * Global variables
+ *********************************************************************/
 Sbus2Reciever sbus2;
+PwmOutServo motor_boom;
+PwmOutServo motor_roll;
 std::array<RtosTaskConfigRawPtr, 2> task_configs;
 
 
+
+/**********************************************************************
+ * Task functions
+ *********************************************************************/
 void task_parse_sbus2(void *param)
 {
     sbus2.parse();
+    motor_boom.out((sbus2.getChannel(0)/1024.0)-1.0);
+    motor_roll.out((sbus2.getChannel(0)/1024.0)-1.0);
 }
 
-void task_draw_display(void *param)
+void task_draw_infomation(void *param)
 {
     Serial.printf(
         "1:%5d, 2:%5d, 3:%5d, 4:%5d, 5:%5d, 6:%5d, "
-        "7:%5d, 8:%5d, 9:%5d,10:%5d, "
-        "fs:%1d, lf:%1d\r\n",
-        sbus2.getChannel(0),
-        sbus2.getChannel(1),
-        sbus2.getChannel(2),
-        sbus2.getChannel(3),
-        sbus2.getChannel(4),
-        sbus2.getChannel(5),
-        sbus2.getChannel(6),
-        sbus2.getChannel(7),
-        sbus2.getChannel(8),
-        sbus2.getChannel(9),
-        sbus2.isFailsafe(),
-        sbus2.isLostframe()
+        "7:%5d, 8:%5d, 9:%5d,10:%5d, fs:%1d, lf:%1d\r\n",
+        sbus2.getChannel(0), sbus2.getChannel(1),
+        sbus2.getChannel(2), sbus2.getChannel(3),
+        sbus2.getChannel(4), sbus2.getChannel(5),
+        sbus2.getChannel(6), sbus2.getChannel(7),
+        sbus2.getChannel(8), sbus2.getChannel(9),
+        sbus2.isFailsafe(), sbus2.isLostframe()
     );
 }
 
 
+
+/**********************************************************************
+ * intialize and loop
+ *********************************************************************/
 void setup() {
     // begin M5Unified.
     auto cfg = M5.config();
@@ -57,6 +66,9 @@ void setup() {
         while(1);
     };
 
+    // モーター出力を初期化
+    motor_boom.begin(38, 0);
+    motor_roll.begin(39, 1);
 
     task_configs[0] = new RtosTaskConfig_typedef{
         "task_parse_sbus2",
@@ -67,17 +79,28 @@ void setup() {
         task_parse_sbus2
     };
     task_configs[1] = new RtosTaskConfig_typedef{
-        "task_draw_display",
+        "task_draw_infomation",
         NULL,
         pdTRUE,
         pdMS_TO_TICKS(100),
         pdMS_TO_TICKS(0),
-        task_draw_display
+        task_draw_infomation
     };
 
     task_initialize(task_configs.data(), task_configs.size());
     task_start(task_configs.data(), task_configs.size());
 
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    M5.Display.print("5");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    M5.Display.print(" 4");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    M5.Display.print(" 3");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    M5.Display.print(" 2");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    M5.Display.print(" 1\n");
+    vTaskDelay(pdMS_TO_TICKS(1000));
     M5.Display.print("started\n");
 }
 
