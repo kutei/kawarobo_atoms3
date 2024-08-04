@@ -1,3 +1,6 @@
+#ifndef __INCLUDE_MAIN_PWM_OUT_HPP
+#define __INCLUDE_MAIN_PWM_OUT_HPP
+
 #include <Arduino.h>
 #include <M5Unified.h>
 
@@ -20,3 +23,5 @@ public:
 private:
     uint8_t channel;
 };
+
+#endif // __INCLUDE_MAIN_PWM_OUT_HPP
