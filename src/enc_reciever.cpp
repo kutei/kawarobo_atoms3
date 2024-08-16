@@ -1,9 +1,9 @@
 #include "enc_reciever.hpp"
 
-bool EncReciever::begin(Stream *stream, bool invert_enc, bool invert_sw)
+bool EncReciever::begin(Stream *stream_, bool invert_enc, bool invert_sw)
 {
-    if(stream == NULL) return false;
-    this->_stream = stream;
+    if(stream_ == NULL) return false;
+    this->stream = stream_;
 
     this->_sem = xSemaphoreCreateMutex();
     if(this->_sem == NULL) return false;
@@ -18,12 +18,11 @@ bool EncReciever::parse()
 {
     uint16_t err_cnt = 1;
 
-    while(this->_stream->available() > 0){
-        digitalWrite(38, HIGH);
+    this->flush_rx();
 
-        uint8_t buf = this->_stream->read();
+    while(this->stream->available() > 0){
 
-        digitalWrite(38, LOW);
+        uint8_t buf = this->stream->read();
 
         // スタートバイトがエラーかチェック
         if(this->_parse_counter == 0){
@@ -48,8 +47,15 @@ bool EncReciever::parse()
         }
     }
 
-    digitalWrite(38, LOW);
     return err_cnt;
+}
+
+void EncReciever::flush_rx()
+{
+    int rest_over = this->stream->available() - EncReciever::ENC_DATA_LENGTH;
+    if(rest_over > 0){
+        for(int i = 0; i < rest_over; i++) this->stream->read();
+    }
 }
 
 int32_t EncReciever::get_angle()

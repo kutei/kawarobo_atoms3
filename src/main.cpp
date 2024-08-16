@@ -18,6 +18,8 @@
 /**********************************************************************
  * Global variables
  *********************************************************************/
+std::array<RtosTaskConfigRawPtr, 3> task_configs;
+
 Sbus2Reciever sbus2;
 EncReciever enc_boom;
 PwmOutServo motor_boom;
@@ -29,18 +31,28 @@ volatile int lcd_bottom_rect_y1, lcd_bottom_rect_y2;
 
 
 /**********************************************************************
+ * API Functions
+ *********************************************************************/
+void calculate_global_constants(){
+    lcd_bottom_rect_x1 = M5.Lcd.width()*0.9;
+    lcd_bottom_rect_x2 = M5.Lcd.width()*0.95;
+    lcd_bottom_rect_x3 = M5.Lcd.width()*1.0;
+    lcd_bottom_rect_y1 = M5.Lcd.height()*0.95;
+    lcd_bottom_rect_y2 = M5.Lcd.height()*1.0;
+}
+
+
+
+/**********************************************************************
  * Task functions
  *********************************************************************/
-void task_parse_sbus2(void *param)
+void task_serial_parser(void *param)
 {
     sbus2.parse();
-}
-void task_parse_enc(void *param)
-{
     enc_boom.parse();
 }
 
-void task_draw_infomation(void *param)
+void task_draw_info(void *param)
 {
     static uint8_t cnt = 0;
     cnt++;
@@ -82,18 +94,23 @@ void task_control_loop(void *param)
  * intialize and loop
  *********************************************************************/
 void setup() {
-    // begin M5Unified.
+    // M5Unifiedの初期化
     auto cfg = M5.config();
     M5.begin(cfg);
 
-    // set default font size.
+    // フォントサイズを初期化
     M5.Display.setTextSize(1);
     M5.Display.print("initializing...\n");
 
-    // debug serial
-    Serial.begin(460800);
+    // 定数を計算
+    calculate_global_constants();
+
+    // デバッグ用シリアルポートを初期化
+    Serial.begin(921600);
 
     // Serial1をSBUS2受信用に設定(8E2で25byte)
+    Serial1.begin(100000, SERIAL_8E2, 5, -1, true); // Serial1 for SBUS2
+    pinMode(5, INPUT_PULLDOWN);
     int16_t sbus_init = sbus2.begin(&Serial1);
     if(sbus_init != 0){
         M5.Display.printf("sbus2 failed: %d\n", sbus_init);
@@ -101,85 +118,67 @@ void setup() {
     };
 
     // エンコーダ用にSerial2を設定
+    Serial2.begin(921600, SERIAL_8N1, 8, -1); // Serial2 for enc
     if(enc_boom.begin(&Serial2) != true){
         M5.Display.printf("enc_boom failed\n");
         while(1);
     }
 
     // モーター出力を初期化
-    // motor_boom.begin(38, 0);
+    motor_boom.begin(38, 0);
     motor_roll.begin(39, 1);
 
-    pinMode(38, OUTPUT);
-    digitalWrite(38, LOW);
-
-    std::array<RtosTaskConfigRawPtr, 4> task_configs;
     task_configs[0] = new RtosTaskConfig_typedef{
         true,
-        "task_parse_sbus2",
-        NULL,
-        pdTRUE,
-        pdMS_TO_TICKS(10),
-        pdMS_TO_TICKS(0),
-        task_parse_sbus2
-    };
-    task_configs[1] = new RtosTaskConfig_typedef{
-        true,
-        "task_parse_enc",
+        "task_parser",
         NULL,
         pdTRUE,
         pdMS_TO_TICKS(5),
         pdMS_TO_TICKS(0),
-        task_parse_enc
+        8096,
+        1,
+        APP_CPU_NUM,
+        task_serial_parser
     };
-    task_configs[2] = new RtosTaskConfig_typedef{
+    task_configs[1] = new RtosTaskConfig_typedef{
         true,
-        "task_draw_infomation",
+        "task_draw_info",
         NULL,
         pdTRUE,
         pdMS_TO_TICKS(200),
         pdMS_TO_TICKS(0),
-        task_draw_infomation
+        8096,
+        1,
+        APP_CPU_NUM,
+        task_draw_info
     };
-    task_configs[3] = new RtosTaskConfig_typedef{
+    task_configs[2] = new RtosTaskConfig_typedef{
         true,
         "task_control_loop",
         NULL,
         pdTRUE,
         pdMS_TO_TICKS(2),
         pdMS_TO_TICKS(0),
+        8096,
+        1,
+        APP_CPU_NUM,
         task_control_loop
     };
 
-    task_initialize(task_configs.data(), task_configs.size());
+    // count down
+    char buf[3] = { ' ', '5', '\0' };
+    for(int i = 5; i > 0; i--){
+        M5.Display.print(buf);
+        buf[1]--;
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 
-    vTaskDelay(pdMS_TO_TICKS(250));
-    M5.Display.print("5");
-    vTaskDelay(pdMS_TO_TICKS(250));
-    M5.Display.print(" 4");
-    vTaskDelay(pdMS_TO_TICKS(250));
-    M5.Display.print(" 3");
-    vTaskDelay(pdMS_TO_TICKS(250));
-    M5.Display.print(" 2");
-    vTaskDelay(pdMS_TO_TICKS(250));
-    M5.Display.print(" 1\n");
-    vTaskDelay(pdMS_TO_TICKS(250));
+    M5.Display.printf("\n\nstarting all tasks\n");
 
-    Serial1.begin(100000, SERIAL_8E2, 5, -1, true); // Serial1 for SBUS2
-    pinMode(5, INPUT_PULLDOWN);
-    Serial2.begin(921600, SERIAL_8N1, 8, -1); // Serial2 for enc
-
+    enc_boom.flush_rx();
     task_start(task_configs.data(), task_configs.size());
-    M5.Display.print("started\n");
-
-    lcd_bottom_rect_x1 = M5.Lcd.width()*0.9;
-    lcd_bottom_rect_x2 = M5.Lcd.width()*0.95;
-    lcd_bottom_rect_x3 = M5.Lcd.width()*1.0;
-    lcd_bottom_rect_y1 = M5.Lcd.height()*0.95;
-    lcd_bottom_rect_y2 = M5.Lcd.height()*1.0;
-
+    M5.Display.print("[[started]]\n");
 }
-
 
 
 
@@ -189,8 +188,6 @@ void loop() {
     M5.Display.fillRect(lcd_bottom_rect_x2, lcd_bottom_rect_y1, lcd_bottom_rect_x3, lcd_bottom_rect_y2, BLACK);
 
     vTaskDelay(100);
-    digitalWrite(38, HIGH);
     M5.Display.fillRect(lcd_bottom_rect_x1, lcd_bottom_rect_y1, lcd_bottom_rect_x2, lcd_bottom_rect_y2, BLACK);
     M5.Display.fillRect(lcd_bottom_rect_x2, lcd_bottom_rect_y1, lcd_bottom_rect_x3, lcd_bottom_rect_y2, WHITE);
-    digitalWrite(38, LOW);
 }

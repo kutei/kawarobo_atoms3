@@ -13,12 +13,13 @@ public:
     static const int ENC_DATA_LENGTH = 5;
     bool begin(Stream *stream, bool invert_enc = false, bool invert_sw = false);
     bool parse();
+    void flush_rx();
     int32_t get_angle();
     bool is_initialized();
     bool is_on_upper_side();
+    Stream *stream;
 
 private:
-    Stream *_stream;
     SemaphoreHandle_t _sem;
     int32_t _angle = 0;
     bool _is_initialized = false;
