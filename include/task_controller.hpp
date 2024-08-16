@@ -8,6 +8,7 @@
 #include <memory>
 
 typedef struct{
+    bool start_required;
     const char *name;
     TimerHandle_t thand;
     BaseType_t repeated;

@@ -10,8 +10,8 @@ public:
     static constexpr uint32_t TIMER_FREQUENCY = 50;
     static constexpr uint32_t TIMER_RESOLUTION = 14;
     static constexpr uint32_t TIMER_RESOLUTION_VAL = 16384;
-    static constexpr uint32_t MIN_TIME_US = 1120;
-    static constexpr uint32_t MAX_TIME_US = 1920;
+    static constexpr uint32_t MIN_TIME_US = 1110;
+    static constexpr uint32_t MAX_TIME_US = 1930;
 
     static constexpr uint32_t PWM_US_WIDTH = (MAX_TIME_US - MIN_TIME_US) / 2;
     static constexpr uint32_t PWM_US_CENTER = (MAX_TIME_US + MIN_TIME_US) / 2;

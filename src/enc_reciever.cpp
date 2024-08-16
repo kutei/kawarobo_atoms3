@@ -19,7 +19,11 @@ bool EncReciever::parse()
     uint16_t err_cnt = 1;
 
     while(this->_stream->available() > 0){
+        digitalWrite(38, HIGH);
+
         uint8_t buf = this->_stream->read();
+
+        digitalWrite(38, LOW);
 
         // スタートバイトがエラーかチェック
         if(this->_parse_counter == 0){
@@ -33,6 +37,7 @@ bool EncReciever::parse()
         this->_recieve_buf[this->_parse_counter] = buf;
         this->_parse_counter++;
 
+
         if(this->_parse_counter >= EncReciever::ENC_DATA_LENGTH){
             this->_parse_counter = 0;
 
@@ -43,6 +48,7 @@ bool EncReciever::parse()
         }
     }
 
+    digitalWrite(38, LOW);
     return err_cnt;
 }
 

@@ -25,7 +25,7 @@ int16_t task_initialize(RtosTaskConfigRawPtr *task_configs, std::size_t size){
 int16_t task_start(RtosTaskConfigRawPtr *task_configs, std::size_t size){
     for(int i = 0; i < size; i++){
         auto conf = task_configs[i];
-        xTimerStart(conf->thand, conf->initial);
+        if(conf->start_required) xTimerStart(conf->thand, conf->initial);
     }
     return 0;
 }
