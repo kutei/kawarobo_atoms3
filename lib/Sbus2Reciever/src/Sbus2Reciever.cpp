@@ -60,6 +60,19 @@ int16_t Sbus2Reciever::getChannel(int ch)
 
     return ret;
 }
+bool Sbus2Reciever::getVtailChannel(int16_t *ch0, int16_t *ch1, int16_t *ch2, int16_t *ch3)
+{
+    if(ch0 == NULL || ch1 == NULL || ch2 == NULL || ch3 == NULL) return false;
+
+    if(xSemaphoreTake(this->_sem, portMAX_DELAY) != pdTRUE) return false;
+    *ch0 = this->_recieved[0];
+    *ch1 = this->_recieved_vtail[0];
+    *ch2 = this->_recieved[2];
+    *ch3 = this->_recieved_vtail[1];
+    xSemaphoreGive(this->_sem);
+
+    return true;
+}
 bool Sbus2Reciever::isFailsafe()
 {
     bool ret;
@@ -125,6 +138,10 @@ bool Sbus2Reciever::_parseOnce()
     }else{
         lostframe = false;
     }
+
+    // VTAILのチャンネルを計算
+    this->_recieved_vtail[0] = ((int)ch[1] - ch[3]) / 2 + 1024;
+    this->_recieved_vtail[1] = ((int)ch[1] + ch[3]) / 2;
 
     // 公開用のバッファにコピー
     if(xSemaphoreTake(this->_sem, portMAX_DELAY) != pdTRUE) return false;
