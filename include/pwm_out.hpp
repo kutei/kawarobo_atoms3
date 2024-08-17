@@ -17,11 +17,12 @@ public:
     static constexpr uint32_t PWM_US_CENTER = (MAX_TIME_US + MIN_TIME_US) / 2;
     static constexpr float PWM_US_TO_CNT = TIMER_RESOLUTION_VAL / (1000000.0 / TIMER_FREQUENCY);
 
-    void begin(uint8_t pin, uint8_t channel);
+    void begin(uint8_t pin, uint8_t channel, bool inverted = false);
     uint32_t out(float in);
 
 private:
     uint8_t channel;
+    bool inverted;
 };
 
 #endif // __INCLUDE_MAIN_PWM_OUT_HPP

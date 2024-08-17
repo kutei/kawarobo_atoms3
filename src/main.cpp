@@ -36,7 +36,8 @@
 #define BOOM_UP_MOVE_SQRT_THRESHOLD 0.55 // ブームアップするための移動入力量の閾値
 
 // システム動作パラメータ系
-#define SERIAL_OUT_SBUS2 true       // SBUS2受信データをシリアル出力するかどうか
+// #define SERIAL_OUT_SBUS2_RAW        // SBUS2受信データを生データで出力する場合定義
+#define SERIAL_OUT_CONTROL_STATUS   // 制御状態を出力する場合定義
 
 
 /**********************************************************************
@@ -126,7 +127,7 @@ void task_serial_parser(void *param)
 
 void task_draw_info(void *param)
 {
-#if SERIAL_OUT_SBUS2 == true
+#if defined(SERIAL_OUT_SBUS2_RAW) || defined(SERIAL_OUT_CONTROL_STATUS)
     static uint8_t cnt = 0;
     cnt++;
     char head = cnt % 4;
@@ -138,7 +139,7 @@ void task_draw_info(void *param)
     int16_t vtail_ch[4] = { 0 };
     sbus2.getVtailChannel(&vtail_ch[0], &vtail_ch[1], &vtail_ch[2], &vtail_ch[3]);
 
-#if false
+#if defined(SERIAL_OUT_SBUS2_RAW)
     Serial.printf(
         "%c 1:%4d, 2:%4d, 3:%4d, 4:%4d, 5:%4d, 6:%4d, "
         "7:%4d, 8:%4d, 9:%4d,10:%4d, fs:%1d, lf:%1d, enc:%d.%d.%d\r\n",
@@ -150,7 +151,7 @@ void task_draw_info(void *param)
         sbus2.isFailsafe(), sbus2.isLostframe(),
         enc_boom.is_initialized(), enc_boom.is_on_upper_side(), enc_boom.get_angle()
     );
-#endif
+#elif defined(SERIAL_OUT_CONTROL_STATUS)
     Serial.printf(
         "%c 1:%+3.02f, 2:%+3.02f, 3:%+3.02f, 4:%+3.02f, b:%+3.02f, r:%+3.02f, "
         "m:%+3.02f, slp:%4d, 9:%4d,10:%4d, fs:%1d, lf:%1d, enc:%d.%d.%d\r\n",
@@ -162,7 +163,7 @@ void task_draw_info(void *param)
         sbus2.isFailsafe(), sbus2.isLostframe(),
         enc_boom.is_initialized(), enc_boom.is_on_upper_side(), enc_boom.get_angle()
     );
-
+#endif
 #endif
 
     // LCDにロボット状態を表示
@@ -177,6 +178,10 @@ void task_draw_info(void *param)
 // 制御ループ
 void task_control_loop(void *param)
 {
+    //////////////////////////////////////////////////////////////
+    // 入力取得と状態遷移
+    //////////////////////////////////////////////////////////////
+
     // 初期化中は制御ループはskipする
     bool is_robot_status_not_control =
         robot_status == RobotStatus::RSTAT_WAITING_STABILIZED
@@ -221,6 +226,10 @@ void task_control_loop(void *param)
     }
 
 
+    //////////////////////////////////////////////////////////////
+    // ロボットのroll軸の制御
+    //////////////////////////////////////////////////////////////
+
     // roll出力を計算
     bool roll_attaking = false;
     float roll_input = sbus2_ch[0];
@@ -254,8 +263,15 @@ void task_control_loop(void *param)
             roll_output = ROLL_ADJ_SPEED;
         }
     }
+
+    // roll出力をモーターに出力
     motor_roll.out(roll_output);
     motor_output[1] = roll_output;
+
+
+    //////////////////////////////////////////////////////////////
+    // ロボットのboom軸の制御
+    //////////////////////////////////////////////////////////////
 
     // boomの制御状態を更新
     if(roll_attaking == true){
@@ -270,7 +286,7 @@ void task_control_loop(void *param)
     int32_t boom_target = 0 + (int)(2000 * sbus2_ch[2]);
     int32_t diff = boom_target - enc_boom.get_angle();
 
-    float boom_output = - diff * 0.0005;
+    float boom_output = diff * 0.0005;
     if(boom_output > 0.2){ boom_output = 0.2; }
     if(boom_output < -0.2){ boom_output = -0.2; }
     motor_boom.out(boom_output);
@@ -314,7 +330,7 @@ void setup() {
     }
 
     // モーター出力を初期化
-    motor_boom.begin(38, 0);
+    motor_boom.begin(38, 0, true);
     motor_roll.begin(39, 1);
 
     task_configs[0] = new RtosTaskConfig_typedef{
