@@ -11,14 +11,36 @@
 /**********************************************************************
  * Control parameters
  *********************************************************************/
+#define NUMBER_OF_TASKS 4
 #define ROLL_ATTAKING_THRESHOLD 1550
+
+#define LOOP_ALIVE_COUNT_THRESHOLD 20 // ループが正常に実行され始めていると判定するための閾値
 
 
 
 /**********************************************************************
+ * Enum
+ *********************************************************************/
+enum ControlStatus{
+    INACTIVE,
+    ACTIVE_NORMAL,
+    ACTIVE_SLOW,
+};
+
+enum RobotStatus{
+    WAITING_STABILIZED,
+    COUNTING_DOWN,
+    INITIALIZING,
+    SLEEPING,
+    STARTING_POSE,
+    BOOM_UP,
+    ROLLING,
+};
+
+/**********************************************************************
  * Global variables
  *********************************************************************/
-std::array<RtosTaskConfigRawPtr, 3> task_configs;
+std::array<RtosTaskConfigRawPtr, NUMBER_OF_TASKS> task_configs;
 
 Sbus2Reciever sbus2;
 EncReciever enc_boom;
@@ -27,6 +49,11 @@ PwmOutServo motor_roll;
 
 volatile int lcd_bottom_rect_x1, lcd_bottom_rect_x2, lcd_bottom_rect_x3;
 volatile int lcd_bottom_rect_y1, lcd_bottom_rect_y2;
+
+int core1_alive_count = 0;
+
+enum ControlStatus control_status = ControlStatus::INACTIVE;
+enum RobotStatus robot_status = RobotStatus::WAITING_STABILIZED;
 
 
 
@@ -46,6 +73,13 @@ void calculate_global_constants(){
 /**********************************************************************
  * Task functions
  *********************************************************************/
+void task_core1_counter(void *param)
+{
+    if(core1_alive_count < LOOP_ALIVE_COUNT_THRESHOLD){
+        core1_alive_count++;
+    }
+}
+
 void task_serial_parser(void *param)
 {
     sbus2.parse();
@@ -164,8 +198,39 @@ void setup() {
         APP_CPU_NUM,
         task_control_loop
     };
+    task_configs[3] = new RtosTaskConfig_typedef{
+        true,
+        "task_core1_counter",
+        NULL,
+        pdTRUE,
+        pdMS_TO_TICKS(500),
+        pdMS_TO_TICKS(0),
+        1024,
+        5,
+        APP_CPU_NUM,
+        task_core1_counter
+    };
+
+    // エンコーダ入力をクリアしてからタスクの処理を開始
+    M5.Display.printf("\nstarting all tasks\n");
+    enc_boom.flush_rx();
+    task_start(task_configs.data(), task_configs.size());
+    M5.Display.print("[[task started]]\n");
+
+    // タスクが正常に開始されるまで待機
+    M5.Display.print("waiting stablized\n");
+    while(core1_alive_count < LOOP_ALIVE_COUNT_THRESHOLD){
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+
+    // 制御データを正常受信するまで待機
+    M5.Display.print("waiting comms\n");
+    while(sbus2.isLostframe() == true || enc_boom.is_recieved() == false){
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
 
     // count down
+    robot_status = RobotStatus::COUNTING_DOWN;
     char buf[3] = { ' ', '5', '\0' };
     for(int i = 5; i > 0; i--){
         M5.Display.print(buf);
@@ -173,11 +238,8 @@ void setup() {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
-    M5.Display.printf("\n\nstarting all tasks\n");
-
-    enc_boom.flush_rx();
-    task_start(task_configs.data(), task_configs.size());
-    M5.Display.print("[[started]]\n");
+    // 制御開始
+    robot_status = RobotStatus::SLEEPING;
 }
 
 

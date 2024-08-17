@@ -15,6 +15,7 @@ public:
     bool parse();
     void flush_rx();
     int32_t get_angle();
+    bool is_recieved();
     bool is_initialized();
     bool is_on_upper_side();
     Stream *stream;
@@ -22,6 +23,7 @@ public:
 private:
     SemaphoreHandle_t _sem;
     int32_t _angle = 0;
+    bool _is_recieved = false;
     bool _is_initialized = false;
     bool _is_on_upper_side = false;
     uint8_t _recieve_buf[ENC_DATA_LENGTH];

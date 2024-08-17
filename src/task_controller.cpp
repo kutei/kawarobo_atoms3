@@ -2,6 +2,9 @@
 
 #include <M5Unified.h>
 
+
+#define MAX_CHARS_TASK_NAME 16
+
 static void task_executer(void *param){
     auto conf = (RtosTaskConfigRawPtr)param;
 
@@ -23,7 +26,7 @@ int16_t task_start(RtosTaskConfigRawPtr *task_configs, std::size_t size){
         auto conf = task_configs[i];
 
         if(conf->start_required){
-            M5.Display.printf("-[T]%s\n", conf->name);
+            M5.Display.printf("-[T]%.*s\n", MAX_CHARS_TASK_NAME, conf->name);
             xTaskCreatePinnedToCore(
                 task_executer,
                 conf->name,
@@ -34,7 +37,7 @@ int16_t task_start(RtosTaskConfigRawPtr *task_configs, std::size_t size){
                 conf->core_id
             );
         }else{
-            M5.Display.printf("-[ ]%s\n", conf->name);
+            M5.Display.printf("-[ ]%.*s\n", MAX_CHARS_TASK_NAME, conf->name);
         }
     }
     return 0;

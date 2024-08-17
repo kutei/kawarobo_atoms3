@@ -66,6 +66,14 @@ int32_t EncReciever::get_angle()
 
     return ret;
 }
+bool EncReciever::is_recieved()
+{
+    if(xSemaphoreTake(this->_sem, portMAX_DELAY) != pdTRUE) return false;
+    bool ret = this->_is_recieved;
+    xSemaphoreGive(this->_sem);
+
+    return ret;
+}
 bool EncReciever::is_initialized()
 {
     if(xSemaphoreTake(this->_sem, portMAX_DELAY) != pdTRUE) return false;
@@ -119,6 +127,7 @@ bool EncReciever::_parse_from_buffer_once()
     // 公開用変数に格納
     if(xSemaphoreTake(this->_sem, portMAX_DELAY) != pdTRUE) return false;
     this->_angle = agl;
+    this->_is_recieved = true;
     this->_is_initialized = init;
     this->_is_on_upper_side = side;
     xSemaphoreGive(this->_sem);
