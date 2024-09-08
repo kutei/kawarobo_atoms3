@@ -334,52 +334,52 @@ void setup() {
     motor_roll.begin(39, 1);
 
     task_configs[0] = new RtosTaskConfig_typedef{
-        true,
-        "task_serial_parser",
-        NULL,
-        pdTRUE,
-        pdMS_TO_TICKS(5),
-        pdMS_TO_TICKS(0),
-        8096,
-        1,
-        APP_CPU_NUM,
-        task_serial_parser
+        .start_required = true,
+        .name           = "task_serial_parser",
+        .thand          = NULL,
+        .repeated       = pdTRUE,
+        .period         = pdMS_TO_TICKS(5),
+        .initial        = pdMS_TO_TICKS(0),
+        .stack_size     = 8096,
+        .priority       = 1,
+        .core_id        = APP_CPU_NUM,
+        .callback       = task_serial_parser
     };
     task_configs[1] = new RtosTaskConfig_typedef{
-        true,
-        "task_draw_info",
-        NULL,
-        pdTRUE,
-        pdMS_TO_TICKS(200),
-        pdMS_TO_TICKS(0),
-        8096,
-        1,
-        APP_CPU_NUM,
-        task_draw_info
+        .start_required = true,
+        .name           = "task_draw_info",
+        .thand          = NULL,
+        .repeated       = pdTRUE,
+        .period         = pdMS_TO_TICKS(200),
+        .initial        = pdMS_TO_TICKS(0),
+        .stack_size     = 8096,
+        .priority       = 1,
+        .core_id        = APP_CPU_NUM,
+        .callback       = task_draw_info
     };
     task_configs[2] = new RtosTaskConfig_typedef{
-        true,
-        "task_control_loop",
-        NULL,
-        pdTRUE,
-        pdMS_TO_TICKS(2),
-        pdMS_TO_TICKS(0),
-        8096,
-        1,
-        APP_CPU_NUM,
-        task_control_loop
+        .start_required = true,
+        .name           = "task_control_loop",
+        .thand          = NULL,
+        .repeated       = pdTRUE,
+        .period         = pdMS_TO_TICKS(2),
+        .initial        = pdMS_TO_TICKS(0),
+        .stack_size     = 8096,
+        .priority       = 1,
+        .core_id        = APP_CPU_NUM,
+        .callback       = task_control_loop
     };
     task_configs[3] = new RtosTaskConfig_typedef{
-        true,
-        "task_core1_counter",
-        NULL,
-        pdTRUE,
-        pdMS_TO_TICKS(500),
-        pdMS_TO_TICKS(0),
-        1024,
-        5,
-        APP_CPU_NUM,
-        task_core1_counter
+        .start_required = true,
+        .name           = "task_core1_counter",
+        .thand          = NULL,
+        .repeated       = pdTRUE,
+        .period         = pdMS_TO_TICKS(500),
+        .initial        = pdMS_TO_TICKS(0),
+        .stack_size     = 1024,
+        .priority       = 5,
+        .core_id        = APP_CPU_NUM,
+        .callback       = task_core1_counter
     };
 
     // エンコーダ入力をクリアしてからタスクの処理を開始
