@@ -1,6 +1,6 @@
 #include "pwm_out.hpp"
 
-void PwmOutServo::begin(uint8_t pin, uint8_t channel, bool inverted = false)
+void PwmOutServo::begin(uint8_t pin, uint8_t channel, bool inverted)
 {
     this->channel = channel;
     this->inverted = inverted;

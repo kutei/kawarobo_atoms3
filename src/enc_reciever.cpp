@@ -111,7 +111,7 @@ bool EncReciever::_parse_from_buffer_once()
     else if(this->_recieve_buf[0] == 'n')
     {
         init = false;
-        side = true;
+        side = false;
     }
 
     // 回転角をパース
