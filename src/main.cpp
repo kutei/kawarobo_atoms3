@@ -335,7 +335,7 @@ void setup() {
 
     task_configs[0] = new RtosTaskConfig_typedef{
         true,
-        "task_parser",
+        "task_serial_parser",
         NULL,
         pdTRUE,
         pdMS_TO_TICKS(5),
