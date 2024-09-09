@@ -15,24 +15,24 @@
 /**********************************************************************
  * Global variables
  *********************************************************************/
-extern Sbus2Reciever sbus2;
-extern EncReciever enc_boom;
-extern PwmOutServo motor_boom;
-extern PwmOutServo motor_roll;
+extern Sbus2Reciever g_sbus2;
+extern EncReciever g_enc_boom;
+extern PwmOutServo g_motor_boom;
+extern PwmOutServo g_motor_roll;
 
-extern volatile int lcd_bottom_rect_x1, lcd_bottom_rect_x2, lcd_bottom_rect_x3;
-extern volatile int lcd_bottom_rect_y1, lcd_bottom_rect_y2;
+extern volatile int g_lcd_bottom_rect_x1, g_lcd_bottom_rect_x2, g_lcd_bottom_rect_x3;
+extern volatile int g_lcd_bottom_rect_y1, g_lcd_bottom_rect_y2;
 
-extern int core1_alive_count;
+extern int g_core1_alive_count;
 
-extern enum RobotStatus robot_status;
-extern enum ControlStatus control_status;
+extern enum RobotStatus g_robot_status;
+extern enum ControlStatus g_control_status;
 
-extern float sbus2_ch[4];
-extern float motor_output[2];
-extern float movement_power_square;
+extern float g_sbus2_ch[4];
+extern float g_motor_output[2];
+extern float g_movement_power_square;
 
-extern uint32_t start_pose_sleep_counter;
+extern uint32_t g_start_pose_sleep_counter;
 
 
 /**********************************************************************

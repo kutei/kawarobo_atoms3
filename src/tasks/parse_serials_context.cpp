@@ -4,6 +4,6 @@
 
 void ParseSerialsContext::onExecute()
 {
-    sbus2.parse();
-    enc_boom.parse();
+    g_sbus2.parse();
+    g_enc_boom.parse();
 }

@@ -44,22 +44,22 @@ void setup() {
     // Serial1をSBUS2受信用に設定(8E2で25byte)
     Serial1.begin(100000, SERIAL_8E2, 5, -1, true); // Serial1 for SBUS2
     pinMode(5, INPUT_PULLDOWN);
-    int16_t sbus_init = sbus2.begin(&Serial1);
+    int16_t sbus_init = g_sbus2.begin(&Serial1);
     if(sbus_init != 0){
-        M5.Display.printf("sbus2 failed: %d\n", sbus_init);
+        M5.Display.printf("g_sbus2 failed: %d\n", sbus_init);
         while(1);
     };
 
     // エンコーダ用にSerial2を設定
     Serial2.begin(921600, SERIAL_8N1, 8, -1); // Serial2 for enc
-    if(enc_boom.begin(&Serial2, true) != true){
-        M5.Display.printf("enc_boom failed\n");
+    if(g_enc_boom.begin(&Serial2, true) != true){
+        M5.Display.printf("g_enc_boom failed\n");
         while(1);
     }
 
     // モーター出力を初期化
-    motor_boom.begin(38, 0, true);
-    motor_roll.begin(39, 1);
+    g_motor_boom.begin(38, 0, true);
+    g_motor_roll.begin(39, 1);
 
     task_configs[0] = std::make_shared<ParseSerialsContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
@@ -116,7 +116,7 @@ void setup() {
 
     // エンコーダ入力をクリアしてからタスクの処理を開始
     M5.Display.printf("\nstarting all tasks\n");
-    enc_boom.flush_rx();
+    g_enc_boom.flush_rx();
     task_start(task_configs.data(), task_configs.size());
 
     // タスクの実行状態を表示
@@ -131,18 +131,18 @@ void setup() {
 
     // タスクが正常に開始されるまで待機
     M5.Display.print("waiting stablized\n");
-    while(core1_alive_count < LOOP_ALIVE_COUNT_THRESHOLD){
+    while(g_core1_alive_count < LOOP_ALIVE_COUNT_THRESHOLD){
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 
     // 制御データを正常受信するまで待機
     M5.Display.print("waiting comms\n");
-    while(sbus2.isLostframe() == true || enc_boom.is_recieved() == false){
+    while(g_sbus2.isLostframe() == true || g_enc_boom.is_recieved() == false){
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 
     // count down
-    robot_status = RobotStatus::RSTAT_COUNTING_DOWN;
+    g_robot_status = RobotStatus::RSTAT_COUNTING_DOWN;
     char buf[3] = { ' ', '5', '\0' };
     for(int i = 5; i > 0; i--){
         M5.Display.print(buf);
@@ -151,17 +151,17 @@ void setup() {
     }
 
     // 制御開始
-    robot_status = RobotStatus::RSTAT_SLEEPING;
+    g_robot_status = RobotStatus::RSTAT_SLEEPING;
 }
 
 
 
 void loop() {
     vTaskDelay(100);
-    M5.Display.fillRect(lcd_bottom_rect_x1, lcd_bottom_rect_y1, lcd_bottom_rect_x2, lcd_bottom_rect_y2, WHITE);
-    M5.Display.fillRect(lcd_bottom_rect_x2, lcd_bottom_rect_y1, lcd_bottom_rect_x3, lcd_bottom_rect_y2, BLACK);
+    M5.Display.fillRect(g_lcd_bottom_rect_x1, g_lcd_bottom_rect_y1, g_lcd_bottom_rect_x2, g_lcd_bottom_rect_y2, WHITE);
+    M5.Display.fillRect(g_lcd_bottom_rect_x2, g_lcd_bottom_rect_y1, g_lcd_bottom_rect_x3, g_lcd_bottom_rect_y2, BLACK);
 
     vTaskDelay(100);
-    M5.Display.fillRect(lcd_bottom_rect_x1, lcd_bottom_rect_y1, lcd_bottom_rect_x2, lcd_bottom_rect_y2, BLACK);
-    M5.Display.fillRect(lcd_bottom_rect_x2, lcd_bottom_rect_y1, lcd_bottom_rect_x3, lcd_bottom_rect_y2, WHITE);
+    M5.Display.fillRect(g_lcd_bottom_rect_x1, g_lcd_bottom_rect_y1, g_lcd_bottom_rect_x2, g_lcd_bottom_rect_y2, BLACK);
+    M5.Display.fillRect(g_lcd_bottom_rect_x2, g_lcd_bottom_rect_y1, g_lcd_bottom_rect_x3, g_lcd_bottom_rect_y2, WHITE);
 }
