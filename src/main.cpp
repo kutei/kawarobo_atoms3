@@ -1,6 +1,9 @@
+#include "global_constants.hpp"
+#include "global_variables.hpp"
 #include "task_controller.hpp"
-#include "pwm_out.hpp"
-#include "enc_reciever.hpp"
+#include "tasks/core_counter_context.hpp"
+#include "peripherals/pwm_out.hpp"
+#include "peripherals/enc_reciever.hpp"
 
 #include <Sbus2Reciever.hpp>
 
@@ -13,77 +16,13 @@
  * Constants and macros
  *********************************************************************/
 #define NUMBER_OF_TASKS 4   // タスクの数
-#define MAX_CHARS_TASK_NAME 16
-#define SBUS2_BUTON_IS_HIGH(x) ((x) > 1500)
-#define SBUS2_BUTON_IS_LOW(x) ((x) < 500)
-#define POW2(x) ((x)*(x))
-
-
-
-/**********************************************************************
- * Control parameters
- *********************************************************************/
-// システム制御パラメータ系
-#define LOOP_ALIVE_COUNT_THRESHOLD 20   // ループが正常に実行され始めていると判定するための閾値
-#define SLEEP_BUTTON_START_POSE_THRESHOLD  2000   // スリープボタンでスタート姿勢用長押ししたと判定するための閾値
-#define SLEEP_BUTTON_SLEEP_THRESHOLD 4000   // スリープボタンでスリープ用長押ししたと判定するための閾値
-
-// ロボット動作パラメータ系
-#define ROLL_DEADZONE 0.05              // ロール入力のデッドゾーン
-#define ROLL_ADJ_INPUT_MAX 0.6          // ロール入力で調整中と判定する最大入力値
-#define ROLL_ADJ_SPEED 0.15             // ロール入力で調整するときの速度
-#define ROLL_ROLLING_SPEED 1.0          // ロール入力で回転するときの速度
-#define UNSLEEP_MOVE_SQRT_THRESHOLD 0.1 // スリープ解除するための移動入力量の閾値
-#define BOOM_UP_MOVE_SQRT_THRESHOLD 0.55 // ブームアップするための移動入力量の閾値
-
-// システム動作パラメータ系
-// #define SERIAL_OUT_SBUS2_RAW        // SBUS2受信データを生データで出力する場合定義
-#define SERIAL_OUT_CONTROL_STATUS   // 制御状態を出力する場合定義
-
-
-/**********************************************************************
- * Enum
- *********************************************************************/
-enum RobotStatus{
-    RSTAT_WAITING_STABILIZED,
-    RSTAT_COUNTING_DOWN,
-    RSTAT_INITIALIZING,
-    RSTAT_SLEEPING,
-    RSTAT_STARTING_POSE,
-    RSTAT_NORMAL,
-};
-
-enum ControlStatus{
-    CSTAT_NORMAL,
-    CSTAT_BOOM_UP_MOVING,
-    CSTAT_ROLLING,
-};
 
 
 
 /**********************************************************************
  * Global variables
  *********************************************************************/
-std::array<AbstractRtosTaskContextSharedPtr, NUMBER_OF_TASKS> task_configs;
-
-Sbus2Reciever sbus2;
-EncReciever enc_boom;
-PwmOutServo motor_boom;
-PwmOutServo motor_roll;
-
-volatile int lcd_bottom_rect_x1, lcd_bottom_rect_x2, lcd_bottom_rect_x3;
-volatile int lcd_bottom_rect_y1, lcd_bottom_rect_y2;
-
-int core1_alive_count = 0;
-
-enum RobotStatus robot_status = RobotStatus::RSTAT_WAITING_STABILIZED;
-enum ControlStatus control_status = ControlStatus::CSTAT_NORMAL;
-
-float sbus2_ch[4] = { 0.0 };
-float motor_output[2] = { 0.0 };
-float movement_power_square = 0.0;
-
-uint32_t start_pose_sleep_counter = 0;
+static std::array<AbstractRtosTaskContextSharedPtr, NUMBER_OF_TASKS> task_configs;
 
 
 
@@ -113,19 +52,6 @@ float conv_sbus2_to_float(uint16_t val, int16_t offset = 0, bool invert = false)
 /**********************************************************************
  * Task functions
  *********************************************************************/
-class Core1CounterContext : public AbstractRtosTaskContext
-{
-public:
-    Core1CounterContext(RtosTaskConfigSharedPtr config) : AbstractRtosTaskContext(config) {};
-    void onExecute();
-};
-
-void Core1CounterContext::onExecute()
-{
-    if(core1_alive_count < LOOP_ALIVE_COUNT_THRESHOLD){
-        core1_alive_count++;
-    }
-}
 
 
 class ParseSerialsContext : public AbstractRtosTaskContext
@@ -418,9 +344,9 @@ void setup() {
     // タスクの実行状態を表示
     for(int i = 0; i < task_configs.size(); i++){
         if(task_configs[i]->isStarted()){
-            M5.Display.printf("-[T]%.*s\n", MAX_CHARS_TASK_NAME, task_configs[i]->getConfig()->name);
+            M5.Display.printf("-[T]%.*s\n", MAX_CHARS_DISPLAY_WIDTH, task_configs[i]->getConfig()->name);
         }else{
-            M5.Display.printf("-[ ]%.*s\n", MAX_CHARS_TASK_NAME, task_configs[i]->getConfig()->name);
+            M5.Display.printf("-[ ]%.*s\n", MAX_CHARS_DISPLAY_WIDTH, task_configs[i]->getConfig()->name);
         }
     }
     M5.Display.print("[[task started]]\n");

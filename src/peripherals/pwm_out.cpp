@@ -1,4 +1,4 @@
-#include "pwm_out.hpp"
+#include "peripherals/pwm_out.hpp"
 
 void PwmOutServo::begin(uint8_t pin, uint8_t channel, bool inverted)
 {
