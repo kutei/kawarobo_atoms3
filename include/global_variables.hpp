@@ -35,4 +35,9 @@ extern float movement_power_square;
 extern uint32_t start_pose_sleep_counter;
 
 
+/**********************************************************************
+ * Initialize Function
+ *********************************************************************/
+void calculate_global_constants();
+
 #endif // __INCLUDE_GLOBAL_VARIABLES_HPP

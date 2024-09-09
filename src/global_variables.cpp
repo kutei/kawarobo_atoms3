@@ -35,4 +35,17 @@ float movement_power_square = 0.0;
 uint32_t start_pose_sleep_counter = 0;
 
 
+/**********************************************************************
+ * Initialize Function
+ *********************************************************************/
+void calculate_global_constants(){
+    lcd_bottom_rect_x1 = M5.Lcd.width()*0.9;
+    lcd_bottom_rect_x2 = M5.Lcd.width()*0.95;
+    lcd_bottom_rect_x3 = M5.Lcd.width()*1.0;
+    lcd_bottom_rect_y1 = M5.Lcd.height()*0.95;
+    lcd_bottom_rect_y2 = M5.Lcd.height()*1.0;
+}
+
+
+
 #endif // __INCLUDE_GLOBAL_VARIABLES_HPP
