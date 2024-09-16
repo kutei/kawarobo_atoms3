@@ -21,7 +21,7 @@
 
 // システム動作パラメータ系
 // #define SERIAL_OUT_SBUS2_RAW        // SBUS2受信データを生データで出力する場合定義
-#define SERIAL_OUT_CONTROL_STATUS   // 制御状態を出力する場合定義
+// #define SERIAL_OUT_CONTROL_STATUS   // 制御状態を出力する場合定義
 
 
 

@@ -85,7 +85,9 @@ void setup() {
             .stack_size     = 8096,
             .priority       = 1,
             .core_id        = APP_CPU_NUM,
-        })
+        }),
+        &Serial,
+        &M5.Display
     );
     task_configs[2] = std::make_shared<ControlLoopContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
