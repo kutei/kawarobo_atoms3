@@ -171,6 +171,28 @@ void setup() {
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 
+    // エンコーダの位置の初期化行動を実行
+    if(!g_enc_boom.is_initialized()){
+        M5.Display.print("\nenc initializing");
+        g_robot_status = RobotStatus::RSTAT_INITIALIZING;
+
+        if(g_enc_boom.is_on_upper_side()){
+            M5.Display.print("__");
+            g_motor_boom.out(-0.1);
+        }else{
+            M5.Display.print("^^");
+            g_motor_boom.out(0.1);
+        }
+
+        while(!g_enc_boom.is_initialized()){
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
+        M5.Display.print("\n  -> done!\n");
+        g_motor_boom.out(0);
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+
     // 制御開始
     g_robot_status = RobotStatus::RSTAT_SLEEPING;
 }

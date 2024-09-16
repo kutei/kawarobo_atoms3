@@ -14,7 +14,13 @@ UpdateLcdContext::UpdateLcdContext(RtosTaskConfigSharedPtr config, M5GFX *disp)
 
 void UpdateLcdContext::onExecute()
 {
-    if(g_robot_status == RobotStatus::RSTAT_WAITING_STABILIZED || g_robot_status == RobotStatus::RSTAT_COUNTING_DOWN){
+    // 通常状態の場合にのみ表示する
+    bool is_normal_status =
+        g_robot_status == RobotStatus::RSTAT_SLEEPING ||
+        g_robot_status == RobotStatus::RSTAT_STARTING_POSE ||
+        g_robot_status == RobotStatus::RSTAT_NORMAL;
+
+    if(!is_normal_status){
         return;
     }
 
