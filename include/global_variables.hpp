@@ -10,6 +10,7 @@
 #include "peripherals/enc_reciever.hpp"
 
 #include <Sbus2Reciever.hpp>
+#include <atomic>
 
 
 /**********************************************************************
@@ -20,10 +21,7 @@ extern EncReciever g_enc_boom;
 extern PwmOutServo g_motor_boom;
 extern PwmOutServo g_motor_roll;
 
-extern volatile int g_lcd_bottom_rect_x1, g_lcd_bottom_rect_x2, g_lcd_bottom_rect_x3;
-extern volatile int g_lcd_bottom_rect_y1, g_lcd_bottom_rect_y2;
-
-extern int g_core1_alive_count;
+extern std::atomic<int> g_core1_alive_count;
 
 extern enum RobotStatus g_robot_status;
 extern enum ControlStatus g_control_status;

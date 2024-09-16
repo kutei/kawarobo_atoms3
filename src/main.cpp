@@ -5,6 +5,7 @@
 #include "tasks/parse_serials_context.hpp"
 #include "tasks/serial_command_executor_context.hpp"
 #include "tasks/control_loop_context.hpp"
+#include "tasks/update_lcd_context.hpp"
 #include "peripherals/pwm_out.hpp"
 #include "peripherals/enc_reciever.hpp"
 
@@ -18,7 +19,7 @@
 /**********************************************************************
  * Constants, macros and in-file global variables
  *********************************************************************/
-#define NUMBER_OF_TASKS 4   // タスクの数
+#define NUMBER_OF_TASKS 5   // タスクの数
 static std::array<AbstractRtosTaskContextSharedPtr, NUMBER_OF_TASKS> task_configs;
 
 
@@ -70,24 +71,23 @@ void setup() {
             .period         = pdMS_TO_TICKS(5),
             .initial        = pdMS_TO_TICKS(0),
             .stack_size     = 8096,
-            .priority       = 1,
+            .priority       = 2,
             .core_id        = APP_CPU_NUM,
         })
     );
     task_configs[1] = std::make_shared<SerialCommandExecutorContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
             .start_required = true,
-            .name           = "task_draw_info",
+            .name           = "task_serial_command_executor",
             .thand          = NULL,
             .repeated       = pdTRUE,
-            .period         = pdMS_TO_TICKS(200),
+            .period         = pdMS_TO_TICKS(100),
             .initial        = pdMS_TO_TICKS(0),
             .stack_size     = 8096,
-            .priority       = 1,
-            .core_id        = APP_CPU_NUM,
+            .priority       = 4,
+            .core_id        = PRO_CPU_NUM,
         }),
-        &Serial,
-        &M5.Display
+        &Serial
     );
     task_configs[2] = std::make_shared<ControlLoopContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
@@ -102,13 +102,27 @@ void setup() {
             .core_id        = APP_CPU_NUM,
         })
     );
-    task_configs[3] = std::make_shared<Core1CounterContext>(
+    task_configs[3] = std::make_shared<UpdateLcdContext>(
+        std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
+            .start_required = true,
+            .name           = "task_update_lcd_context",
+            .thand          = NULL,
+            .repeated       = pdTRUE,
+            .period         = pdMS_TO_TICKS(100),
+            .initial        = pdMS_TO_TICKS(0),
+            .stack_size     = 8096,
+            .priority       = 2,
+            .core_id        = PRO_CPU_NUM,
+        }),
+        &M5.Display
+    );
+    task_configs[4] = std::make_shared<Core1CounterContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
             .start_required = true,
             .name           = "task_core1_counter",
             .thand          = NULL,
             .repeated       = pdTRUE,
-            .period         = pdMS_TO_TICKS(500),
+            .period         = pdMS_TO_TICKS(100),
             .initial        = pdMS_TO_TICKS(0),
             .stack_size     = 1024,
             .priority       = 5,
@@ -137,6 +151,11 @@ void setup() {
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 
+    // シリアル通信でデバイスインフォメーションを表示
+    Serial.printf("##################################################\n");
+    Serial.printf("##              Command Line Tools              ##\n");
+    Serial.printf("##################################################\n");
+
     // 制御データを正常受信するまで待機
     M5.Display.print("waiting comms\n");
     while(g_sbus2.isLostframe() == true || g_enc_boom.is_recieved() == false){
@@ -159,11 +178,5 @@ void setup() {
 
 
 void loop() {
-    vTaskDelay(100);
-    M5.Display.fillRect(g_lcd_bottom_rect_x1, g_lcd_bottom_rect_y1, g_lcd_bottom_rect_x2, g_lcd_bottom_rect_y2, WHITE);
-    M5.Display.fillRect(g_lcd_bottom_rect_x2, g_lcd_bottom_rect_y1, g_lcd_bottom_rect_x3, g_lcd_bottom_rect_y2, BLACK);
-
-    vTaskDelay(100);
-    M5.Display.fillRect(g_lcd_bottom_rect_x1, g_lcd_bottom_rect_y1, g_lcd_bottom_rect_x2, g_lcd_bottom_rect_y2, BLACK);
-    M5.Display.fillRect(g_lcd_bottom_rect_x2, g_lcd_bottom_rect_y1, g_lcd_bottom_rect_x3, g_lcd_bottom_rect_y2, WHITE);
+    vTaskDelay(1000);
 }

@@ -4,7 +4,5 @@
 
 void Core1CounterContext::onExecute()
 {
-    if(g_core1_alive_count < LOOP_ALIVE_COUNT_THRESHOLD){
-        g_core1_alive_count++;
-    }
+    g_core1_alive_count++;
 }

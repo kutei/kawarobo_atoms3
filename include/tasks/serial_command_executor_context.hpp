@@ -4,17 +4,20 @@
 #include "task_controller.hpp"
 #include <M5Unified.h>
 
+#include <array>
 
 class SerialCommandExecutorContext : public AbstractRtosTaskContext
 {
 public:
-    SerialCommandExecutorContext(RtosTaskConfigSharedPtr config, Stream *stream, M5GFX *disp)
-        : AbstractRtosTaskContext(config), _stream(stream), _disp(disp) {};
+    // static constexpr std::array<String, 2> KILL_SIGNAL_CHAR = {"Ctrl+C", "Ctrl+["};
+    // constexpr std::array<char, 2> KILL_SIGNAL_CHAR = {3, 27};
+
+    SerialCommandExecutorContext(RtosTaskConfigSharedPtr config, Stream *stream)
+        : AbstractRtosTaskContext(config), _stream(stream) {};
     void onExecute();
 
 private:
     Stream *_stream;
-    M5GFX *_disp;
 };
 
 

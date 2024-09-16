@@ -20,10 +20,7 @@ EncReciever g_enc_boom;
 PwmOutServo g_motor_boom;
 PwmOutServo g_motor_roll;
 
-volatile int g_lcd_bottom_rect_x1, g_lcd_bottom_rect_x2, g_lcd_bottom_rect_x3;
-volatile int g_lcd_bottom_rect_y1, g_lcd_bottom_rect_y2;
-
-int g_core1_alive_count = 0;
+std::atomic<int> g_core1_alive_count(0);
 
 enum RobotStatus g_robot_status = RobotStatus::RSTAT_WAITING_STABILIZED;
 enum ControlStatus g_control_status = ControlStatus::CSTAT_NORMAL;
@@ -39,11 +36,7 @@ uint32_t g_start_pose_sleep_counter = 0;
  * Initialize Function
  *********************************************************************/
 void calculate_global_constants(){
-    g_lcd_bottom_rect_x1 = M5.Lcd.width()*0.9;
-    g_lcd_bottom_rect_x2 = M5.Lcd.width()*0.95;
-    g_lcd_bottom_rect_x3 = M5.Lcd.width()*1.0;
-    g_lcd_bottom_rect_y1 = M5.Lcd.height()*0.95;
-    g_lcd_bottom_rect_y2 = M5.Lcd.height()*1.0;
+    // currently nothing to do
 }
 
 

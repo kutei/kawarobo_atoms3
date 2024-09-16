@@ -7,7 +7,7 @@
  *********************************************************************/
 // システム制御パラメータ系
 #define MAX_CHARS_DISPLAY_WIDTH 16              // ディスプレイの横幅の最大文字数
-#define LOOP_ALIVE_COUNT_THRESHOLD 20           // ループが正常に実行され始めていると判定するための閾値
+#define LOOP_ALIVE_COUNT_THRESHOLD 50          // ループが正常に実行され始めていると判定するための閾値
 #define SLEEP_BUTTON_START_POSE_THRESHOLD 2000  // スリープボタンでスタート姿勢用長押ししたと判定するための閾値
 #define SLEEP_BUTTON_SLEEP_THRESHOLD 4000       // スリープボタンでスリープ用長押ししたと判定するための閾値
 
@@ -18,10 +18,6 @@
 #define ROLL_ROLLING_SPEED 1.0          // ロール入力で回転するときの速度
 #define UNSLEEP_MOVE_SQRT_THRESHOLD 0.1 // スリープ解除するための移動入力量の閾値
 #define BOOM_UP_MOVE_SQRT_THRESHOLD 0.55 // ブームアップするための移動入力量の閾値
-
-// システム動作パラメータ系
-// #define SERIAL_OUT_SBUS2_RAW        // SBUS2受信データを生データで出力する場合定義
-// #define SERIAL_OUT_CONTROL_STATUS   // 制御状態を出力する場合定義
 
 
 
