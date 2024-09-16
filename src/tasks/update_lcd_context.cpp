@@ -24,8 +24,24 @@ void UpdateLcdContext::onExecute()
         return;
     }
 
+    // 背景色を状態に合わせて変更
+    uint16_t bg_color;
+    if(g_robot_status == RobotStatus::RSTAT_SLEEPING){
+        bg_color = BLACK;
+    }else if(g_robot_status == RobotStatus::RSTAT_STARTING_POSE){
+        bg_color = DARKGREEN;
+    }else if(g_robot_status == RobotStatus::RSTAT_NORMAL){
+        if(g_control_status == ControlStatus::CSTAT_NORMAL){
+            bg_color = GREEN;
+        }else if(g_control_status == ControlStatus::CSTAT_ROLLING){
+            bg_color = RED;
+        }else if(g_control_status == ControlStatus::CSTAT_BOOM_UP_MOVING){
+            bg_color = NAVY;
+        }
+    }
+
     // LCDにロボット状態を表示
-    this->_disp->fillRect(0, 0, this->_disp->width(), this->_disp->height(), BLACK);
+    this->_disp->fillRect(0, 0, this->_disp->width(), this->_disp->height(), bg_color);
     this->_disp->setCursor(0, 0);
     this->_disp->printf("robot status: %d\n", g_robot_status);
     this->_disp->printf("control status: %d\n", g_control_status);
