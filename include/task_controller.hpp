@@ -28,6 +28,7 @@ public:
     inline RtosTaskConfigSharedPtr getConfig() { return this->_config; };
     inline bool isStarted() { return this->_is_started; };
     inline void setStarted(bool started) { this->_is_started = started; };
+    virtual void onActivated() {};
     virtual void onExecute() = 0;
 
 private:

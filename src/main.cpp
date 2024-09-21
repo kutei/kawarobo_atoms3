@@ -82,7 +82,7 @@ void setup() {
             .thand          = NULL,
             .repeated       = pdTRUE,
             .period         = pdMS_TO_TICKS(100),
-            .initial        = pdMS_TO_TICKS(0),
+            .initial        = pdMS_TO_TICKS(2000),
             .stack_size     = 8096,
             .priority       = 4,
             .core_id        = PRO_CPU_NUM,
@@ -150,11 +150,6 @@ void setup() {
     while(g_core1_alive_count < LOOP_ALIVE_COUNT_THRESHOLD){
         vTaskDelay(pdMS_TO_TICKS(100));
     }
-
-    // シリアル通信でデバイスインフォメーションを表示
-    Serial.printf("##################################################\n");
-    Serial.printf("##              Command Line Tools              ##\n");
-    Serial.printf("##################################################\n");
 
     // 制御データを正常受信するまで待機
     M5.Display.print("waiting comms\n");

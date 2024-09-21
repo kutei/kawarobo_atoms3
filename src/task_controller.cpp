@@ -32,6 +32,7 @@ int16_t task_start(AbstractRtosTaskContextSharedPtr *task_context, std::size_t s
 
         if(conf->start_required){
             task_context[i]->setStarted(true);
+            task_context[i]->onActivated();
             xTaskCreatePinnedToCore(
                 task_executer,
                 conf->name,
