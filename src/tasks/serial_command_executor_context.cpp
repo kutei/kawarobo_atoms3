@@ -9,6 +9,7 @@ SerialCommandExecutorContext::SerialCommandExecutorContext(RtosTaskConfigSharedP
     ;
 }
 
+
 void SerialCommandExecutorContext::onActivated()
 {
     this->_stream->print("##################################################"); this->_send_br();
@@ -38,9 +39,12 @@ void SerialCommandExecutorContext::onExecute()
                 this->_latest_cmdbuf.pop_back();
                 this->_stream->print("\b \b");
             }
+        }else if(c == '\n'){
+            is_exec_required = true;
+            this->_send_br();
+            break;
         }else if(c == '\r'){
             is_exec_required = true;
-            this->_stream->print(c);
         }else{
             this->_latest_cmdbuf.push_back(c);
             this->_stream->print(c);
@@ -62,6 +66,7 @@ void SerialCommandExecutorContext::onExecute()
             cmd_arg_chars++;
         }
     }
+    this->_cmd_args[cmd_arg_num][cmd_arg_chars] = '\0';
 
     // コマンドの実行
     this->_execute_command();
@@ -79,8 +84,10 @@ void SerialCommandExecutorContext::_execute_command()
         return;
     }
 
-    this->_stream->printf("error: command not found: %s", this->_cmd_args[0].data());
-    this->_send_br();
+    if(this->_cmd_args[0][0] != '\0'){
+        this->_stream->printf("error: command not found: %s", this->_cmd_args[0].data());
+        this->_send_br();
+    }
 }
 
 
@@ -97,7 +104,7 @@ bool SerialCommandExecutorContext::_is_kill_char(char c)
 
 void SerialCommandExecutorContext::_send_br()
 {
-    this->_stream->print("\n\r");
+    this->_stream->print("\r\n");
 }
 
 
