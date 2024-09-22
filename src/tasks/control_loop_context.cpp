@@ -17,6 +17,8 @@ float conv_sbus2_to_float(uint16_t val, int16_t offset = 0, bool invert = false)
 
 void ControlLoopContext::onExecute()
 {
+    if(!g_control_loop_active) return;
+
     //////////////////////////////////////////////////////////////
     // 入力取得と状態遷移
     //////////////////////////////////////////////////////////////

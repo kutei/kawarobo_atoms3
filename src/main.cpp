@@ -85,7 +85,7 @@ void setup() {
             .initial        = pdMS_TO_TICKS(2000),
             .stack_size     = 8096,
             .priority       = 4,
-            .core_id        = PRO_CPU_NUM,
+            .core_id        = APP_CPU_NUM,
         }),
         &Serial
     );

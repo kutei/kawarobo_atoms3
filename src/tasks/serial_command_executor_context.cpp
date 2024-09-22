@@ -82,6 +82,53 @@ void SerialCommandExecutorContext::_execute_command()
             this->_stream->print(arg.data()); this->_send_br();
         }
         return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "s") == 0){
+        this->_stream->printf(
+            "1:%+3.02f, 2:%+3.02f, 3:%+3.02f, 4:%+3.02f, b:%+3.02f, r:%+3.02f, "
+            "m:%+3.02f, slp:%4d, 9:%4d,10:%4d, fs:%1d, lf:%1d",
+            g_sbus2_ch[0], g_sbus2_ch[1], g_sbus2_ch[2], g_sbus2_ch[3],
+            g_motor_output[0], g_motor_output[1],
+            sqrt(g_movement_power_square), g_start_pose_sleep_counter,
+            g_sbus2.getChannel(8), g_sbus2.getChannel(9),
+            g_sbus2.isFailsafe(), g_sbus2.isLostframe()
+        );
+        this->_send_br();
+        return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "e") == 0){
+        this->_stream->printf(
+            "enc:%d.%d.%d", g_enc_boom.is_initialized(), g_enc_boom.is_on_upper_side(), g_enc_boom.get_angle()
+        );
+        this->_send_br();
+        return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "mot") == 0){
+        double v_boom = atof(this->_cmd_args[1].data());
+        double v_roll = atof(this->_cmd_args[2].data());
+        int msec = atoi(this->_cmd_args[3].data());
+
+        if(v_boom > 1.0) v_boom = 1.0;
+        if(v_boom < -1.0) v_boom = -1.0;
+        if(v_roll > 1.0) v_roll = 1.0;
+        if(v_roll < -1.0) v_roll = -1.0;
+        if(msec < 0) msec = 0;
+        if(msec > 1000) msec = 1000;
+        this->_stream->printf("mot: %.03f, %.03f, %d", v_boom, v_roll, msec);
+
+        g_motor_boom.out(v_boom);
+        g_motor_roll.out(v_roll);
+
+        vTaskDelay(pdMS_TO_TICKS(msec));
+
+        g_motor_boom.out(0);
+        g_motor_roll.out(0);
+        this->_send_br();
+
+        return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "act") == 0){
+        g_control_loop_active = true;
+        return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "deact") == 0){
+        g_control_loop_active = false;
+        return;
     }
 
     if(this->_cmd_args[0][0] != '\0'){

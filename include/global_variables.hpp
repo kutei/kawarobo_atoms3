@@ -30,7 +30,8 @@ extern float g_sbus2_ch[4];
 extern float g_motor_output[2];
 extern float g_movement_power_square;
 
-extern uint32_t g_start_pose_sleep_counter;
+extern uint32_t g_start_pose_sleep_counter;     // 初期状態への遷移を決めるためのカウンタ
+extern std::atomic<bool> g_control_loop_active; // 制御ループがアクティブかどうか
 
 
 /**********************************************************************
