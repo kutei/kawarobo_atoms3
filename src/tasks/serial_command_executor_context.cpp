@@ -96,7 +96,13 @@ void SerialCommandExecutorContext::_execute_command()
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "e") == 0){
         this->_stream->printf(
-            "enc:%d.%d.%d", g_enc_boom.is_initialized(), g_enc_boom.is_on_upper_side(), g_enc_boom.get_angle()
+            "enc:%d,%d,%d", g_enc_boom.is_initialized(), g_enc_boom.is_on_upper_side(), g_enc_boom.get_angle()
+        );
+        this->_send_br();
+        return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "l") == 0){
+        this->_stream->printf(
+            "pid: %d, %d, %.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
         );
         this->_send_br();
         return;

@@ -37,7 +37,7 @@ void ControlLoopContext::onExecute()
     g_sbus2_ch[1] = conv_sbus2_to_float(vtail_ch[1], 0, true);
     g_sbus2_ch[2] = conv_sbus2_to_float(vtail_ch[2], 0, false);
     g_sbus2_ch[3] = conv_sbus2_to_float(vtail_ch[3], 32, false);
-    float move_square = g_sbus2_ch[1] * g_sbus2_ch[1] + g_sbus2_ch[3] * g_sbus2_ch[3];
+    float move_square = POW2(g_sbus2_ch[1]) + POW2(g_sbus2_ch[3]);
     g_movement_power_square = move_square;
 
     // スリープボタンのカウンタを更新
@@ -124,7 +124,15 @@ void ControlLoopContext::onExecute()
     }
 
     // boom出力を計算
-    g_pid_boom.set_target(0 + (int)(2000 * g_sbus2_ch[2]));
+    int32_t target = 0;
+    if(g_control_status == ControlStatus::CSTAT_NORMAL){
+        target = BOOM_NORMAL_POSITION + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2]);
+    }else if(g_control_status == ControlStatus::CSTAT_BOOM_UP_MOVING){
+        target = BOOM_UP_POSTION + (int32_t)(BOOM_UP_STICK_SENSITIVITY * g_sbus2_ch[2]);
+    }else if(g_control_status == ControlStatus::CSTAT_ROLLING){
+        target = BOOM_ROLLING_POSITION + (int32_t)(BOOM_ROLLING_STICK_SENSITIVITY * g_sbus2_ch[2]);
+    }
+    g_pid_boom.set_target(target);
     int32_t out = g_pid_boom.step(g_enc_boom.get_angle());
     float boom_output = out / 6000.0;
     g_motor_boom.out(boom_output);
