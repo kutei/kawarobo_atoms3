@@ -5,11 +5,15 @@
  * Include
  *********************************************************************/
 #include "global_constants.hpp"
+#include "global_variables.hpp"
 #include "task_controller.hpp"
+#include "pid_controller.hpp"
 #include "peripherals/pwm_out.hpp"
 #include "peripherals/enc_reciever.hpp"
 
 #include <Sbus2Reciever.hpp>
+#include <atomic>
+
 
 
 /**********************************************************************
@@ -19,6 +23,7 @@ Sbus2Reciever g_sbus2;
 EncReciever g_enc_boom;
 PwmOutServo g_motor_boom;
 PwmOutServo g_motor_roll;
+PidController g_pid_boom;
 
 std::atomic<int> g_core1_alive_count(0);
 

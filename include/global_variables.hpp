@@ -6,6 +6,7 @@
  *********************************************************************/
 #include "global_constants.hpp"
 #include "task_controller.hpp"
+#include "pid_controller.hpp"
 #include "peripherals/pwm_out.hpp"
 #include "peripherals/enc_reciever.hpp"
 
@@ -20,6 +21,7 @@ extern Sbus2Reciever g_sbus2;
 extern EncReciever g_enc_boom;
 extern PwmOutServo g_motor_boom;
 extern PwmOutServo g_motor_roll;
+extern PidController g_pid_boom;
 
 extern std::atomic<int> g_core1_alive_count;
 

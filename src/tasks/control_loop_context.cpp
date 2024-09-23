@@ -124,12 +124,9 @@ void ControlLoopContext::onExecute()
     }
 
     // boom出力を計算
-    int32_t boom_target = 0 + (int)(2000 * g_sbus2_ch[2]);
-    int32_t diff = boom_target - g_enc_boom.get_angle();
-
-    float boom_output = diff * 0.0005;
-    if(boom_output > 0.2){ boom_output = 0.2; }
-    if(boom_output < -0.2){ boom_output = -0.2; }
+    g_pid_boom.set_target(0 + (int)(2000 * g_sbus2_ch[2]));
+    int32_t out = g_pid_boom.step(g_enc_boom.get_angle());
+    float boom_output = out / 6000.0;
     g_motor_boom.out(boom_output);
     g_motor_output[0] = boom_output;
 }
