@@ -54,10 +54,12 @@ void ControlLoopContext::onExecute()
         // Failsafeなら、即座にSLEEPに遷移する
         g_robot_status = RobotStatus::RSTAT_SLEEPING;
     }else{
-        if(g_start_pose_sleep_counter >= SLEEP_BUTTON_SLEEP_THRESHOLD){
+        if(g_start_pose_sleep_counter == 0 && g_robot_status == RobotStatus::RSTAT_STARTING_POSE_READY){
+            g_robot_status = RobotStatus::RSTAT_STARTING_POSE;
+        }else if(g_start_pose_sleep_counter >= SLEEP_BUTTON_SLEEP_THRESHOLD){
             g_robot_status = RobotStatus::RSTAT_SLEEPING;
         }else if(g_start_pose_sleep_counter >= SLEEP_BUTTON_START_POSE_THRESHOLD){
-            g_robot_status = RobotStatus::RSTAT_STARTING_POSE;
+            g_robot_status = RobotStatus::RSTAT_STARTING_POSE_READY;
         }
         if(move_square > POW2(UNSLEEP_MOVE_SQRT_THRESHOLD)){
             g_robot_status = RobotStatus::RSTAT_NORMAL;

@@ -14,9 +14,12 @@ UpdateLcdContext::UpdateLcdContext(RtosTaskConfigSharedPtr config, M5GFX *disp)
 
 void UpdateLcdContext::onExecute()
 {
+    this->_update_counter++;
+
     // 通常状態の場合にのみ表示する
     bool is_normal_status =
         g_robot_status == RobotStatus::RSTAT_SLEEPING ||
+        g_robot_status == RobotStatus::RSTAT_STARTING_POSE_READY ||
         g_robot_status == RobotStatus::RSTAT_STARTING_POSE ||
         g_robot_status == RobotStatus::RSTAT_NORMAL;
 
@@ -30,6 +33,12 @@ void UpdateLcdContext::onExecute()
         bg_color = BLACK;
     }else if(g_robot_status == RobotStatus::RSTAT_STARTING_POSE){
         bg_color = DARKGREEN;
+    }else if(g_robot_status == RobotStatus::RSTAT_STARTING_POSE_READY){
+        if(this->_update_counter % 2 == 0){
+            bg_color = GREEN;
+        }else{
+            bg_color = DARKGREEN;
+        }
     }else if(g_robot_status == RobotStatus::RSTAT_NORMAL){
         if(g_control_status == ControlStatus::CSTAT_NORMAL){
             bg_color = GREEN;

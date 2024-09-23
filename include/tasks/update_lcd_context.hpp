@@ -18,6 +18,7 @@ private:
     int _brect_y; // CoRE1のKeep Aliveを示す四角形の座標
     int _brect_w; // CoRE1のKeep Aliveを示す四角形の座標
     int _brect_h; // CoRE1のKeep Aliveを示す四角形の座標
+    unsigned long _update_counter = 0;
 };
 
 

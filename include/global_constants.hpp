@@ -8,8 +8,8 @@
 // システム制御パラメータ系
 #define MAX_CHARS_DISPLAY_WIDTH 16              // ディスプレイの横幅の最大文字数
 #define LOOP_ALIVE_COUNT_THRESHOLD 50          // ループが正常に実行され始めていると判定するための閾値
-#define SLEEP_BUTTON_START_POSE_THRESHOLD 1000  // スリープボタンでスタート姿勢用長押ししたと判定するための閾値
-#define SLEEP_BUTTON_SLEEP_THRESHOLD 2000       // スリープボタンでスリープ用長押ししたと判定するための閾値
+#define SLEEP_BUTTON_START_POSE_THRESHOLD 500  // スリープボタンでスタート姿勢用長押ししたと判定するための閾値
+#define SLEEP_BUTTON_SLEEP_THRESHOLD 1000       // スリープボタンでスリープ用長押ししたと判定するための閾値
 
 // ロボット動作パラメータ系
 #define ROLL_DEADZONE 0.05              // ロール入力のデッドゾーン
@@ -44,6 +44,7 @@ enum RobotStatus{
     RSTAT_COUNTING_DOWN,
     RSTAT_INITIALIZING,
     RSTAT_SLEEPING,
+    RSTAT_STARTING_POSE_READY,
     RSTAT_STARTING_POSE,
     RSTAT_NORMAL,
 };
