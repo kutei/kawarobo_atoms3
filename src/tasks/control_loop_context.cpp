@@ -132,12 +132,16 @@ void ControlLoopContext::onExecute()
 
     // boom出力を計算
     int32_t target = 0;
-    if(g_control_status == ControlStatus::CSTAT_NORMAL){
-        target = BOOM_NORMAL_POSITION + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2]);
-    }else if(g_control_status == ControlStatus::CSTAT_BOOM_UP_MOVING){
-        target = BOOM_UP_POSTION + (int32_t)(BOOM_UP_STICK_SENSITIVITY * g_sbus2_ch[2]);
-    }else if(g_control_status == ControlStatus::CSTAT_ROLLING){
-        target = BOOM_ROLLING_POSITION + (int32_t)(BOOM_ROLLING_STICK_SENSITIVITY * g_sbus2_ch[2]);
+    if(g_robot_status == RobotStatus::RSTAT_STARTING_POSE){
+        target = BOOM_STARTING_POSITION;
+    }else{
+        if(g_control_status == ControlStatus::CSTAT_NORMAL){
+            target = BOOM_NORMAL_POSITION + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2]);
+        }else if(g_control_status == ControlStatus::CSTAT_BOOM_UP_MOVING){
+            target = BOOM_UP_POSTION + (int32_t)(BOOM_UP_STICK_SENSITIVITY * g_sbus2_ch[2]);
+        }else if(g_control_status == ControlStatus::CSTAT_ROLLING){
+            target = BOOM_ROLLING_POSITION + (int32_t)(BOOM_ROLLING_STICK_SENSITIVITY * g_sbus2_ch[2]);
+        }
     }
     g_pid_boom.set_target(target);
     int32_t out = g_pid_boom.step(g_enc_boom.get_angle());
