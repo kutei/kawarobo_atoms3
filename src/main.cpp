@@ -59,9 +59,9 @@ void setup() {
     }
 
     // モーター出力を初期化
-    g_motor_boom.begin(38, 0, 0.2, -0.2, true);
+    g_motor_boom.begin(38, 0, 1.0, -1.0, true);
     g_motor_roll.begin(39, 1);
-    g_pid_boom.begin(0.1, 0.0, 0.0, 0.002, 0.0, 21700, -5900);
+    g_pid_boom.begin(0.5, 0.0, 0.02, 0.005, 0.0, 21700, -5900);
 
     task_configs[0] = std::make_shared<ParseSerialsContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
@@ -69,7 +69,7 @@ void setup() {
             .name           = "task_serial_parser",
             .thand          = NULL,
             .repeated       = pdTRUE,
-            .period         = pdMS_TO_TICKS(5),
+            .period         = pdMS_TO_TICKS(2),
             .initial        = pdMS_TO_TICKS(0),
             .stack_size     = 8096,
             .priority       = 2,
@@ -96,7 +96,7 @@ void setup() {
             .name           = "task_control_loop",
             .thand          = NULL,
             .repeated       = pdTRUE,
-            .period         = pdMS_TO_TICKS(2),
+            .period         = pdMS_TO_TICKS(5),
             .initial        = pdMS_TO_TICKS(0),
             .stack_size     = 8096,
             .priority       = 1,

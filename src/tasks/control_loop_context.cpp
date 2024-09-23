@@ -50,13 +50,18 @@ void ControlLoopContext::onExecute()
     }
 
     // 状態遷移を実行
-    if(g_start_pose_sleep_counter >= SLEEP_BUTTON_SLEEP_THRESHOLD){
+    if(g_sbus2.isFailsafe()){
+        // Failsafeなら、即座にSLEEPに遷移する
         g_robot_status = RobotStatus::RSTAT_SLEEPING;
-    }else if(g_start_pose_sleep_counter >= SLEEP_BUTTON_START_POSE_THRESHOLD){
-        g_robot_status = RobotStatus::RSTAT_STARTING_POSE;
-    }
-    if(move_square > POW2(UNSLEEP_MOVE_SQRT_THRESHOLD)){
-        g_robot_status = RobotStatus::RSTAT_NORMAL;
+    }else{
+        if(g_start_pose_sleep_counter >= SLEEP_BUTTON_SLEEP_THRESHOLD){
+            g_robot_status = RobotStatus::RSTAT_SLEEPING;
+        }else if(g_start_pose_sleep_counter >= SLEEP_BUTTON_START_POSE_THRESHOLD){
+            g_robot_status = RobotStatus::RSTAT_STARTING_POSE;
+        }
+        if(move_square > POW2(UNSLEEP_MOVE_SQRT_THRESHOLD)){
+            g_robot_status = RobotStatus::RSTAT_NORMAL;
+        }
     }
 
     // Sleep中はモーター出力を0にする

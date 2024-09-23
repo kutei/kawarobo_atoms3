@@ -16,6 +16,15 @@ uint32_t PwmOutServo::out(float in)
 {
     if(this->inverted) in *= -1;
 
+    int sig = 1;
+    float abs = in;
+    if(in < 0){
+        sig = -1;
+        abs = -in;
+    }
+    in = (abs * (1.0 - PwmOutServo::DEADZONE) + PwmOutServo::DEADZONE) * sig;
+
+
     if(in > this->max) in = this->max;
     if(in < this->min) in = this->min;
 
