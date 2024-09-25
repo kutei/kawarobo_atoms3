@@ -158,7 +158,7 @@ void setup() {
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 
-    // count down
+    /*/ count down
     g_robot_status = RobotStatus::RSTAT_COUNTING_DOWN;
     char buf[3] = { ' ', '5', '\0' };
     for(int i = 5; i > 0; i--){
@@ -166,6 +166,7 @@ void setup() {
         buf[1]--;
         vTaskDelay(pdMS_TO_TICKS(500));
     }
+    //*/
 
     // エンコーダの位置の初期化行動を実行
     if(!g_enc_boom.is_initialized()){
