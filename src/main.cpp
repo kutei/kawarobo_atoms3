@@ -174,10 +174,10 @@ void setup() {
 
         if(g_enc_boom.is_on_upper_side()){
             M5.Display.print("__");
-            g_motor_boom.out(-0.2);
+            g_motor_boom.out(-0.1);
         }else{
             M5.Display.print("^^");
-            g_motor_boom.out(0.2);
+            g_motor_boom.out(0.1);
         }
 
         while(!g_enc_boom.is_initialized()){

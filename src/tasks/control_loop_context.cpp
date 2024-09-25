@@ -68,8 +68,15 @@ void ControlLoopContext::onExecute()
 
     // Sleep中はモーター出力を0にする
     if(g_robot_status == RobotStatus::RSTAT_SLEEPING){
+        // 現在の位置をブレンド値に設定
+        this->_blender.setValues(0, g_enc_boom.get_angle());
+        this->_blender.selectIndex(0, 1.0);
+        this->_blender.get_blended();
+
         g_motor_boom.out(0.0);
         g_motor_roll.out(0.0);
+
+        g_pid_boom.reset();
         return;
     }
 
