@@ -131,19 +131,25 @@ void ControlLoopContext::onExecute()
     }
 
     // boom出力を計算
-    int32_t target = 0;
     if(g_robot_status == RobotStatus::RSTAT_STARTING_POSE){
-        target = BOOM_STARTING_POSITION;
+        this->_blender.setValues(1, BOOM_STARTING_POSITION);
+        this->_blender.selectIndex(1, 0.001);
     }else{
         if(g_control_status == ControlStatus::CSTAT_NORMAL){
-            target = BOOM_NORMAL_POSITION + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2]);
+            int32_t target = BOOM_NORMAL_POSITION + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2]);
+            this->_blender.setValues(2, target);
+            this->_blender.selectIndex(2, 0.01);
         }else if(g_control_status == ControlStatus::CSTAT_BOOM_UP_MOVING){
-            target = BOOM_UP_POSTION + (int32_t)(BOOM_UP_STICK_SENSITIVITY * g_sbus2_ch[2]);
+            int32_t target = BOOM_UP_POSTION + (int32_t)(BOOM_UP_STICK_SENSITIVITY * g_sbus2_ch[2]);
+            this->_blender.setValues(3, target);
+            this->_blender.selectIndex(3, 0.01);
         }else if(g_control_status == ControlStatus::CSTAT_ROLLING){
-            target = BOOM_ROLLING_POSITION + (int32_t)(BOOM_ROLLING_STICK_SENSITIVITY * g_sbus2_ch[2]);
+            int32_t target = BOOM_ROLLING_POSITION + (int32_t)(BOOM_ROLLING_STICK_SENSITIVITY * g_sbus2_ch[2]);
+            this->_blender.setValues(4, target);
+            this->_blender.selectIndex(4, 0.1);
         }
     }
-    g_pid_boom.set_target(target);
+    g_pid_boom.set_target(this->_blender.get_blended());
     int32_t out = g_pid_boom.step(g_enc_boom.get_angle());
     float boom_output = out / 6000.0;
     g_motor_boom.out(boom_output);
