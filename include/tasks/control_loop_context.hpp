@@ -33,10 +33,6 @@ public:
     };
 
     T get_blended() {
-        if (this->_blends[this->_current_index] >= 1.0) {
-            return this->_values[this->_current_index];
-        }
-
         // 選択されたインデックスのブレンド値を上昇させる
         this->_blends[this->_current_index] += this->_current_blend_speed;
 
@@ -55,8 +51,9 @@ public:
             if (i == this->_current_index) continue;
             current_remain += this->_blends[i];
         }
-        for (auto &blend: this->_blends) {
-            blend *= next_remain / current_remain;
+        for (int i = 0; i < N; i++) {
+            if (i == this->_current_index) continue;
+            this->_blends[i] *= next_remain / current_remain;
         }
 
         // 現在のブレンド値を返す
@@ -71,7 +68,7 @@ private:
     std::array<T, N> _values;
     std::array<float, N> _blends;
     std::size_t _current_index;
-    int _current_blend_speed;
+    float _current_blend_speed;
 };
 
 
