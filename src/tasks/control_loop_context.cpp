@@ -151,7 +151,7 @@ void ControlLoopContext::onExecute()
         if(g_control_status == ControlStatus::CSTAT_NORMAL){
             this->_blender.selectIndex(2, 0.01);
         }else if(g_control_status == ControlStatus::CSTAT_BOOM_UP_MOVING){
-            this->_blender.selectIndex(3, 0.01);
+            this->_blender.selectIndex(3, 0.008);
         }else if(g_control_status == ControlStatus::CSTAT_ROLLING){
             this->_blender.selectIndex(4, 0.1);
         }else if(g_control_status == ControlStatus::CSTAT_FALLRECOVERY){
