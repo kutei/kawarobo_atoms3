@@ -12,7 +12,7 @@
 #define SLEEP_BUTTON_SLEEP_THRESHOLD 1000       // スリープボタンでスリープ用長押ししたと判定するための閾値
 
 // ロボット動作パラメータ系
-#define ROLL_DEADZONE 0.05              // ロール入力のデッドゾーン
+#define ROLL_DEADZONE 0.15              // ロール入力のデッドゾーン
 #define ROLL_ADJ_INPUT_MAX 0.6          // ロール入力で調整中と判定する最大入力値
 #define ROLL_ADJ_SPEED 0.15             // ロール入力で調整するときの速度
 #define ROLL_ROLLING_SPEED 1.0          // ロール入力で回転するときの速度
