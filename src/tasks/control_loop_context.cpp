@@ -41,7 +41,7 @@ void ControlLoopContext::onExecute()
     g_movement_power_square = move_square;
 
     // スリープボタンのカウンタを更新
-    if(SBUS2_BUTON_IS_HIGH(g_sbus2.getChannel(9))){
+    if(SBUS2_BUTON_IS_HIGH(g_sbus2.getChannel(4))){
         if(g_start_pose_sleep_counter <= SLEEP_BUTTON_SLEEP_THRESHOLD){
             g_start_pose_sleep_counter++;
         }
