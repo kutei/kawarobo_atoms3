@@ -24,7 +24,7 @@
 #define BOOM_UP_STICK_SENSITIVITY 0         // ブームアップモードのブームのスティック感度
 #define BOOM_ROLLING_POSITION -3000         // ブームローリングモードのブーム位置
 #define BOOM_ROLLING_STICK_SENSITIVITY 2500 // ブームローリングモードのブームのスティック感度
-#define BOOM_STARTING_POSITION 22700        // スタート姿勢のブーム位置
+#define BOOM_STARTING_POSITION 22500        // スタート姿勢のブーム位置
 
 
 
