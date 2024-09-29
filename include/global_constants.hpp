@@ -25,6 +25,8 @@
 #define BOOM_ROLLING_POSITION -3000         // ブームローリングモードのブーム位置
 #define BOOM_ROLLING_STICK_SENSITIVITY 2500 // ブームローリングモードのブームのスティック感度
 #define BOOM_STARTING_POSITION 22500        // スタート姿勢のブーム位置
+#define BOOM_FALLRECOVERY_POSITION 20000    // 転倒回復姿勢のブーム位置
+#define BOOM_FALLRECOVERY_JOYSTICK_THRESHOLD 0.98 // 転倒回復のジョイスティックの閾値
 
 
 
@@ -54,6 +56,7 @@ enum ControlStatus{
     CSTAT_NORMAL,
     CSTAT_BOOM_UP_MOVING,
     CSTAT_ROLLING,
+    CSTAT_FALLRECOVERY,
 };
 
 

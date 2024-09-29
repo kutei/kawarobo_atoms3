@@ -131,6 +131,8 @@ void ControlLoopContext::onExecute()
     // boomの制御状態を更新
     if(roll_attaking == true){
         g_control_status = ControlStatus::CSTAT_ROLLING;
+    }else if(g_sbus2_ch[2] > BOOM_FALLRECOVERY_JOYSTICK_THRESHOLD){
+        g_control_status = ControlStatus::CSTAT_FALLRECOVERY;
     }else if(move_square > POW2(BOOM_UP_MOVE_SQRT_THRESHOLD)){
         g_control_status = ControlStatus::CSTAT_BOOM_UP_MOVING;
     }else{
@@ -142,6 +144,7 @@ void ControlLoopContext::onExecute()
     this->_blender.setValues(2, BOOM_NORMAL_POSITION + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2])); // NORMAL
     this->_blender.setValues(3, BOOM_UP_POSTION + (int32_t)(BOOM_UP_STICK_SENSITIVITY * g_sbus2_ch[2])); // BOOM_UP_MOVING
     this->_blender.setValues(4, BOOM_ROLLING_POSITION + (int32_t)(BOOM_ROLLING_STICK_SENSITIVITY * g_sbus2_ch[2])); // ROLLING
+    this->_blender.setValues(5, BOOM_FALLRECOVERY_POSITION); // FALLRECOVERY
     if(g_robot_status == RobotStatus::RSTAT_STARTING_POSE){
         this->_blender.selectIndex(1, 0.002);
     }else{
@@ -151,6 +154,8 @@ void ControlLoopContext::onExecute()
             this->_blender.selectIndex(3, 0.01);
         }else if(g_control_status == ControlStatus::CSTAT_ROLLING){
             this->_blender.selectIndex(4, 0.1);
+        }else if(g_control_status == ControlStatus::CSTAT_FALLRECOVERY){
+            this->_blender.selectIndex(5, 0.01);
         }
     }
     g_pid_boom.set_target(this->_blender.get_blended());

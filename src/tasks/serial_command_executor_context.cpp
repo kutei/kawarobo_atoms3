@@ -100,6 +100,12 @@ void SerialCommandExecutorContext::_execute_command()
         );
         this->_send_br();
         return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "c") == 0){
+        this->_stream->printf(
+            "r_stat:%d, c_stat:%d", g_robot_status, g_control_status
+        );
+        this->_send_br();
+        return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "l") == 0){
         this->_stream->printf(
             "pid: %d, %d, %.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]

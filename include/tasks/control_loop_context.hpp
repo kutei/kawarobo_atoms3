@@ -79,7 +79,7 @@ public:
     void onExecute();
 
 private:
-    ValueBlender<int32_t, 5> _blender;
+    ValueBlender<int32_t, 6> _blender;
 };
 
 
