@@ -2,7 +2,7 @@
   "name": "Sbus2Reciever",
   "version": "0.1.0",
   "description": "A library for receiving SBUS2 signals from a radio controller(FUTABA)",
-  "keywords": "sbus2, futaba, radio controller",
+  "keywords": "g_sbus2, futaba, radio controller",
   "authors":
   [
     {

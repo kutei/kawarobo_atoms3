@@ -1,4 +1,4 @@
-#include "enc_reciever.hpp"
+#include "peripherals/enc_reciever.hpp"
 
 bool EncReciever::begin(Stream *stream_, bool invert_enc, bool invert_sw)
 {

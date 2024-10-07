@@ -4,7 +4,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
 
-#include <vector>
 #include <memory>
 
 typedef struct{
@@ -17,11 +16,31 @@ typedef struct{
     uint32_t stack_size;
     UBaseType_t priority;
     BaseType_t core_id;
-    TimerCallbackFunction_t callback;
 } RtosTaskConfig_typedef;
 
-using RtosTaskConfigRawPtr = RtosTaskConfig_typedef *;
+using RtosTaskConfigSharedPtr = std::shared_ptr<RtosTaskConfig_typedef>;
 
-int16_t task_start(RtosTaskConfigRawPtr *task_configs, std::size_t size);
+
+class AbstractRtosTaskContext{
+public:
+    AbstractRtosTaskContext(RtosTaskConfigSharedPtr config);
+
+    inline RtosTaskConfigSharedPtr getConfig() { return this->_config; };
+    inline bool isStarted() { return this->_is_started; };
+    inline void setStarted(bool started) { this->_is_started = started; };
+    virtual void onActivated() {};
+    virtual void onExecute() = 0;
+
+private:
+    RtosTaskConfigSharedPtr _config;
+    bool _is_started;
+};
+
+using AbstractRtosTaskContextRawPtr = AbstractRtosTaskContext *;
+using AbstractRtosTaskContextSharedPtr = std::shared_ptr<AbstractRtosTaskContext>;
+
+
+int16_t task_start(AbstractRtosTaskContextSharedPtr *task_context, std::size_t size);
+
 
 #endif // __INCLUDE_MAIN_TAKS_CONTROLLER_HPP
