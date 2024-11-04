@@ -147,30 +147,29 @@ void setup() {
     M5.Display.print("[[task started]]\n");
 
     // タスクが正常に開始されるまで待機
-    M5.Display.print("waiting stablized\n");
+    M5.Display.print("waiting stablized");
     while(g_core1_alive_count < LOOP_ALIVE_COUNT_THRESHOLD){
         vTaskDelay(pdMS_TO_TICKS(100));
     }
+    M5.Display.print(" >ok\n");
 
-    // 制御データを正常受信するまで待機
-    M5.Display.print("waiting comms\n");
-    while(g_sbus2.isLostframe() == true || g_enc_boom.is_recieved() == false){
-        vTaskDelay(pdMS_TO_TICKS(100));
+    // SBUS2データを正常受信するまで待機
+    M5.Display.print("waiting sbus2");
+    while(g_sbus2.isLostframe() == true){
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
+    M5.Display.print(" >ok\n");
 
-    /*/ count down
-    g_robot_status = RobotStatus::RSTAT_COUNTING_DOWN;
-    char buf[3] = { ' ', '5', '\0' };
-    for(int i = 5; i > 0; i--){
-        M5.Display.print(buf);
-        buf[1]--;
-        vTaskDelay(pdMS_TO_TICKS(500));
+    // encデータを正常受信するまで待機
+    M5.Display.print("waiting enc");
+    while(g_enc_boom.is_recieved() == false){
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
-    //*/
+    M5.Display.print(" >ok\n");
 
     // エンコーダの位置の初期化行動を実行
+    M5.Display.print("enc initializing");
     if(!g_enc_boom.is_initialized()){
-        M5.Display.print("\nenc initializing");
         g_robot_status = RobotStatus::RSTAT_INITIALIZING;
 
         if(g_enc_boom.is_on_upper_side()){
@@ -184,11 +183,9 @@ void setup() {
         while(!g_enc_boom.is_initialized()){
             vTaskDelay(pdMS_TO_TICKS(10));
         }
-        M5.Display.print("\n  -> done!\n");
         g_motor_boom.out(0);
-
-        vTaskDelay(pdMS_TO_TICKS(1000));
     }
+    M5.Display.print("\n  -> done!\n");
 
     // 制御開始
     g_robot_status = RobotStatus::RSTAT_SLEEPING;
