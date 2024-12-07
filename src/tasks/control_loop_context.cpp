@@ -143,7 +143,7 @@ void ControlLoopContext::onExecute()
 
     // boom出力を計算
     this->_blender.setValues(1, BOOM_STARTING_POSITION);
-    this->_blender.setValues(2, BOOM_NORMAL_POSITION + g_digital_trim[0] * BOOM_NORMAL_POSITION_TRIM_WIDTH + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2])); // NORMAL
+    this->_blender.setValues(2, BOOM_NORMAL_POSITION + (int32_t)(g_digital_trim[0] * BOOM_NORMAL_POSITION_TRIM_WIDTH) + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2])); // NORMAL
     this->_blender.setValues(3, BOOM_UP_POSTION + (int32_t)(BOOM_UP_STICK_SENSITIVITY * g_sbus2_ch[2])); // BOOM_UP_MOVING
     this->_blender.setValues(4, BOOM_ROLLING_POSITION + (int32_t)(BOOM_ROLLING_STICK_SENSITIVITY * g_sbus2_ch[2])); // ROLLING
     this->_blender.setValues(5, BOOM_FALLRECOVERY_POSITION); // FALLRECOVERY
