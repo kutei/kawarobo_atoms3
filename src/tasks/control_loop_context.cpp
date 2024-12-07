@@ -39,6 +39,8 @@ void ControlLoopContext::onExecute()
     g_sbus2_ch[3] = conv_sbus2_to_float(vtail_ch[3], 32, false);
     float move_square = POW2(g_sbus2_ch[1]) + POW2(g_sbus2_ch[3]);
     g_movement_power_square = move_square;
+    g_digital_trim[0] = -1 * conv_sbus2_to_float(g_sbus2.getChannel(6));
+    g_digital_trim[1] = -1 * conv_sbus2_to_float(g_sbus2.getChannel(7));
 
     // スリープボタンのカウンタを更新
     if(SBUS2_BUTON_IS_HIGH(g_sbus2.getChannel(4))){
@@ -133,7 +135,7 @@ void ControlLoopContext::onExecute()
         g_control_status = ControlStatus::CSTAT_ROLLING;
     }else if(g_sbus2_ch[2] > BOOM_FALLRECOVERY_JOYSTICK_THRESHOLD){
         g_control_status = ControlStatus::CSTAT_FALLRECOVERY;
-    }else if(move_square > POW2(BOOM_UP_MOVE_SQRT_THRESHOLD)){
+    }else if(move_square > POW2(BOOM_UP_MOVE_SQRT_THRESHOLD + BOOM_UP_MOVE_SQRT_THRESHOLD_TRIM_WIDTH * g_digital_trim[1])){
         g_control_status = ControlStatus::CSTAT_BOOM_UP_MOVING;
     }else{
         g_control_status = ControlStatus::CSTAT_NORMAL;
@@ -141,7 +143,7 @@ void ControlLoopContext::onExecute()
 
     // boom出力を計算
     this->_blender.setValues(1, BOOM_STARTING_POSITION);
-    this->_blender.setValues(2, BOOM_NORMAL_POSITION + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2])); // NORMAL
+    this->_blender.setValues(2, BOOM_NORMAL_POSITION + g_digital_trim[0] * BOOM_NORMAL_POSITION_TRIM_WIDTH + (int32_t)(BOOM_NORMAL_STICK_SENSITIVITY * g_sbus2_ch[2])); // NORMAL
     this->_blender.setValues(3, BOOM_UP_POSTION + (int32_t)(BOOM_UP_STICK_SENSITIVITY * g_sbus2_ch[2])); // BOOM_UP_MOVING
     this->_blender.setValues(4, BOOM_ROLLING_POSITION + (int32_t)(BOOM_ROLLING_STICK_SENSITIVITY * g_sbus2_ch[2])); // ROLLING
     this->_blender.setValues(5, BOOM_FALLRECOVERY_POSITION); // FALLRECOVERY

@@ -85,12 +85,14 @@ void SerialCommandExecutorContext::_execute_command()
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "s") == 0){
         this->_stream->printf(
             "1:%+3.02f, 2:%+3.02f, 3:%+3.02f, 4:%+3.02f, b:%+3.02f, r:%+3.02f, "
-            "m:%+3.02f, slp:%4d, 9:%4d,10:%4d, fs:%1d, lf:%1d",
+            "m:%+3.02f, slp:%4d, 9:%4d,10:%4d, fs:%1d, lf:%1d "
+            "dt0:%+3.02f, dt1:%+3.02f",
             g_sbus2_ch[0], g_sbus2_ch[1], g_sbus2_ch[2], g_sbus2_ch[3],
             g_motor_output[0], g_motor_output[1],
             sqrt(g_movement_power_square), g_start_pose_sleep_counter,
             g_sbus2.getChannel(8), g_sbus2.getChannel(9),
-            g_sbus2.isFailsafe(), g_sbus2.isLostframe()
+            g_sbus2.isFailsafe(), g_sbus2.isLostframe(),
+            g_digital_trim[0], g_digital_trim[1]
         );
         this->_send_br();
         return;

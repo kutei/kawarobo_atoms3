@@ -33,6 +33,7 @@ enum ControlStatus g_control_status = ControlStatus::CSTAT_NORMAL;
 float g_sbus2_ch[4] = { 0.0 };
 float g_motor_output[2] = { 0.0 };
 float g_movement_power_square = 0.0;
+float g_digital_trim[2] = { 0.0 };
 
 uint32_t g_start_pose_sleep_counter = 0;
 std::atomic<bool> g_control_loop_active(true);
