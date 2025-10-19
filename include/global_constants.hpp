@@ -19,15 +19,15 @@
 #define UNSLEEP_MOVE_SQRT_THRESHOLD 0.1 // スリープ解除するための移動入力量の閾値
 #define BOOM_UP_MOVE_SQRT_THRESHOLD 0.45            // ブームアップするための移動入力量の閾値
 #define BOOM_UP_MOVE_SQRT_THRESHOLD_TRIM_WIDTH 0.30 // ブームアップするための移動入力量の閾値
-#define BOOM_NORMAL_POSITION 0                  // 通常モードのブーム位置
+#define BOOM_NORMAL_POSITION 2000               // 通常モードのブーム位置
 #define BOOM_NORMAL_POSITION_TRIM_WIDTH 4000    // 通常モードのブーム位置
 #define BOOM_NORMAL_STICK_SENSITIVITY 6000  // 通常モードのブームのスティック感度
 #define BOOM_UP_POSTION 7000                // ブームアップモードのブーム位置
 #define BOOM_UP_STICK_SENSITIVITY 0         // ブームアップモードのブームのスティック感度
-#define BOOM_ROLLING_POSITION -3000         // ブームローリングモードのブーム位置
-#define BOOM_ROLLING_STICK_SENSITIVITY 2500 // ブームローリングモードのブームのスティック感度
-#define BOOM_STARTING_POSITION 22500        // スタート姿勢のブーム位置
-#define BOOM_FALLRECOVERY_POSITION 20000    // 転倒回復姿勢のブーム位置
+#define BOOM_ROLLING_POSITION -1500         // ブームローリングモードのブーム位置
+#define BOOM_ROLLING_STICK_SENSITIVITY 2900 // ブームローリングモードのブームのスティック感度
+#define BOOM_STARTING_POSITION 28500        // スタート姿勢のブーム位置
+#define BOOM_FALLRECOVERY_POSITION 26000    // 転倒回復姿勢のブーム位置
 #define BOOM_FALLRECOVERY_JOYSTICK_THRESHOLD 0.98 // 転倒回復のジョイスティックの閾値
 
 
