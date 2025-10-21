@@ -24,6 +24,7 @@ private:
     Stream *_stream;
     std::vector<char> _latest_cmdbuf;
     std::array<std::array<char, MAX_CMD_LEN>, MAX_CMD_NUM> _cmd_args;
+    bool _tool_mode;
 
     void _execute_command();
 

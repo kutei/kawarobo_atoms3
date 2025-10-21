@@ -4,7 +4,7 @@
 
 
 SerialCommandExecutorContext::SerialCommandExecutorContext(RtosTaskConfigSharedPtr config, Stream *stream)
-    : AbstractRtosTaskContext(config), _stream(stream)
+    : AbstractRtosTaskContext(config), _stream(stream), _tool_mode(false)
 {
     ;
 }
@@ -37,17 +37,23 @@ void SerialCommandExecutorContext::onExecute()
         if(c == '\b'){
             if(this->_latest_cmdbuf.size() > 0){
                 this->_latest_cmdbuf.pop_back();
-                this->_stream->print("\b \b");
+                if(!this->_tool_mode){
+                    this->_stream->print("\b \b");
+                }
             }
         }else if(c == '\n'){
             is_exec_required = true;
-            this->_send_br();
+            if(!this->_tool_mode){
+                this->_send_br();
+            }
             break;
         }else if(c == '\r'){
             is_exec_required = true;
         }else{
             this->_latest_cmdbuf.push_back(c);
-            this->_stream->print(c);
+            if(!this->_tool_mode){
+                this->_stream->print(c);
+            }
         }
     }
     if(!is_exec_required) return;
@@ -83,35 +89,65 @@ void SerialCommandExecutorContext::_execute_command()
         }
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "s") == 0){
-        this->_stream->printf(
-            "1:%+3.02f, 2:%+3.02f, 3:%+3.02f, 4:%+3.02f, b:%+3.02f, r:%+3.02f, "
-            "m:%+3.02f, slp:%4d, 9:%4d,10:%4d, fs:%1d, lf:%1d "
-            "dt0:%+3.02f, dt1:%+3.02f",
-            g_sbus2_ch[0], g_sbus2_ch[1], g_sbus2_ch[2], g_sbus2_ch[3],
-            g_motor_output[0], g_motor_output[1],
-            sqrt(g_movement_power_square), g_start_pose_sleep_counter,
-            g_sbus2.getChannel(8), g_sbus2.getChannel(9),
-            g_sbus2.isFailsafe(), g_sbus2.isLostframe(),
-            g_digital_trim[0], g_digital_trim[1]
-        );
+        if(this->_tool_mode){
+            this->_stream->printf(
+                "%+3.02f,%+3.02f,%+3.02f,%+3.02f,%+3.02f,%+3.02f,%+3.02f,%4d,%4d,%4d,%1d,%1d,%+3.02f,%+3.02f",
+                g_sbus2_ch[0], g_sbus2_ch[1], g_sbus2_ch[2], g_sbus2_ch[3],
+                g_motor_output[0], g_motor_output[1],
+                sqrt(g_movement_power_square), g_start_pose_sleep_counter,
+                g_sbus2.getChannel(8), g_sbus2.getChannel(9),
+                g_sbus2.isFailsafe(), g_sbus2.isLostframe(),
+                g_digital_trim[0], g_digital_trim[1]
+            );
+        }else{
+            this->_stream->printf(
+                "1:%+3.02f, 2:%+3.02f, 3:%+3.02f, 4:%+3.02f, b:%+3.02f, r:%+3.02f, "
+                "m:%+3.02f, slp:%4d, 9:%4d,10:%4d, fs:%1d, lf:%1d "
+                "dt0:%+3.02f, dt1:%+3.02f",
+                g_sbus2_ch[0], g_sbus2_ch[1], g_sbus2_ch[2], g_sbus2_ch[3],
+                g_motor_output[0], g_motor_output[1],
+                sqrt(g_movement_power_square), g_start_pose_sleep_counter,
+                g_sbus2.getChannel(8), g_sbus2.getChannel(9),
+                g_sbus2.isFailsafe(), g_sbus2.isLostframe(),
+                g_digital_trim[0], g_digital_trim[1]
+            );
+        }
         this->_send_br();
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "e") == 0){
-        this->_stream->printf(
-            "enc:%d,%d,%d", g_enc_boom.is_initialized(), g_enc_boom.is_on_upper_side(), g_enc_boom.get_angle()
-        );
+        if(this->_tool_mode){
+            this->_stream->printf(
+                "%d,%d,%d", g_enc_boom.is_initialized(), g_enc_boom.is_on_upper_side(), g_enc_boom.get_angle()
+            );
+        }else{
+            this->_stream->printf(
+                "enc:%d,%d,%d", g_enc_boom.is_initialized(), g_enc_boom.is_on_upper_side(), g_enc_boom.get_angle()
+            );
+        }
         this->_send_br();
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "c") == 0){
-        this->_stream->printf(
-            "r_stat:%d, c_stat:%d", g_robot_status, g_control_status
-        );
+        if(this->_tool_mode){
+            this->_stream->printf(
+                "%d,%d", g_robot_status, g_control_status
+            );
+        }else{
+            this->_stream->printf(
+                "r_stat:%d, c_stat:%d", g_robot_status, g_control_status
+            );
+        }
         this->_send_br();
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "l") == 0){
-        this->_stream->printf(
-            "pid: %d, %d, %.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
-        );
+        if(this->_tool_mode){
+            this->_stream->printf(
+                "%d,%d,%.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
+            );
+        }else{
+            this->_stream->printf(
+                "pid: %d, %d, %.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
+            );
+        }
         this->_send_br();
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "mot") == 0){
@@ -125,7 +161,11 @@ void SerialCommandExecutorContext::_execute_command()
         if(v_roll < -1.0) v_roll = -1.0;
         if(msec < 0) msec = 0;
         if(msec > 1000) msec = 1000;
-        this->_stream->printf("mot: %.03f, %.03f, %d", v_boom, v_roll, msec);
+        if(this->_tool_mode){
+            this->_stream->printf("%.03f,%.03f,%d", v_boom, v_roll, msec);
+        }else{
+            this->_stream->printf("mot: %.03f, %.03f, %d", v_boom, v_roll, msec);
+        }
 
         g_motor_boom.out(v_boom);
         g_motor_roll.out(v_roll);
@@ -143,6 +183,20 @@ void SerialCommandExecutorContext::_execute_command()
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "deact") == 0){
         g_control_loop_active = false;
         return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "enable") == 0){
+        if(strcmp(const_cast<const char *>(this->_cmd_args[1].data()), "tool_mode") == 0){
+            this->_tool_mode = true;
+            return;
+        }
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "disable") == 0){
+        if(strcmp(const_cast<const char *>(this->_cmd_args[1].data()), "tool_mode") == 0){
+            if(!this->_tool_mode){  // 現在tool_modeが無効な場合のみメッセージを表示
+                this->_stream->printf("Tool mode disabled. Echo eabled.");
+                this->_send_br();
+            }
+            this->_tool_mode = false;
+            return;
+        }
     }
 
     if(this->_cmd_args[0][0] != '\0'){
@@ -171,7 +225,9 @@ void SerialCommandExecutorContext::_send_br()
 
 void SerialCommandExecutorContext::_reset_parse()
 {
-    this->_stream->print("$ ");
+    if(!this->_tool_mode){
+        this->_stream->print("$ ");
+    }
     this->_latest_cmdbuf.clear();
     for(int i = 0; i < this->_cmd_args.size(); i++){
         this->_cmd_args[i][0] = '\0';
