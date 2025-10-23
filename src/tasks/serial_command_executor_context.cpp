@@ -139,16 +139,31 @@ void SerialCommandExecutorContext::_execute_command()
         this->_send_br();
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "l") == 0){
-        if(this->_tool_mode){
-            this->_stream->printf(
-                "%d,%d,%.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
-            );
-        }else{
-            this->_stream->printf(
-                "pid: %d, %d, %.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
-            );
+        int msec = atoi(this->_cmd_args[1].data());
+
+        while(1){
+            if(this->_tool_mode){
+                this->_stream->printf(
+                    "%d,%d,%.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
+                );
+            }else{
+                this->_stream->printf(
+                    "pid: %d, %d, %.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
+                );
+            }
+            this->_send_br();
+
+            vTaskDelay(pdMS_TO_TICKS(msec));
+
+            if(this->_stream->available() > 0){
+                char c = this->_stream->read();
+                if(this->_is_kill_char(c)) {
+                    this->_stream->print("^C");
+                    this->_send_br();
+                    break;
+                }
+            }
         }
-        this->_send_br();
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "mot") == 0){
         double v_boom = atof(this->_cmd_args[1].data());
