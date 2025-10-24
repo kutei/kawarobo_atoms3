@@ -61,7 +61,15 @@ void setup() {
     // モーター出力を初期化
     g_motor_boom.begin(38, 0, 1.0, -1.0, true);
     g_motor_roll.begin(39, 1);
-    g_pid_boom.begin(0.65, 0.0, 0.02, 0.005, 0.0, 28500, -7900);
+    g_pid_boom.begin(
+        /* Kp           */ 0.65,
+        /* Ki           */ 0.0,
+        /* Kd           */ 0.02,
+        /* dt           */ 0.005,
+        /* max Integral */ 0.0,
+        /* Target MAX   */ 28500,
+        /* Target MIN   */ -7900
+    );
 
     task_configs[0] = std::make_shared<ParseSerialsContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
