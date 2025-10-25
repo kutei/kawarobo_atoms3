@@ -1,0 +1,3 @@
+[submodule "web_serial_plotter"]
+	path = web_serial_plotter
+	url = git@github.com:kutei/web_serial_plotter.git
