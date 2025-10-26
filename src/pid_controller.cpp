@@ -3,7 +3,7 @@
 
 void PidController::begin(
     float Kp, float Ki, float Kd, float dt,
-    int32_t max_integral, int32_t max_target, int32_t min_target)
+    float max_integral, int32_t max_target, int32_t min_target)
 {
     this->_Kp = Kp;
     this->_Ki = Ki;
@@ -34,22 +34,6 @@ void PidController::set_target(int32_t target){
     this->_target = target;
 }
 
-float PidController::get_integral(void){
-    return this->_integral;
-}
-int32_t PidController::get_error(void){
-    return this->_pre_err;
-}
-int32_t PidController::get_target(){
-    return this->_target;
-}
-int32_t PidController::get_out(){
-    return this->_out;
-}
-int32_t PidController::get_in(){
-    return this->_in;
-}
-
 int32_t PidController::step(int32_t in){
     // targetを移動平均で平滑化
     this->mov_avg_que[this->mov_avg_que_idx] = this->_target;
@@ -76,7 +60,13 @@ int32_t PidController::step(int32_t in){
     // 微分項用に今回の値を保存
     this->_pre_err = err;
 
+    // 計算値を保存
     this->_out = output;
     this->_in = in;
+    this->_term_p = p_act;
+    this->_term_i = i_act;
+    this->_term_d = d_act;
+
+    // 出力値を返す
     return output;
 }

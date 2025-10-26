@@ -139,18 +139,20 @@ void SerialCommandExecutorContext::_execute_command()
         this->_send_br();
         return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "l") == 0){
-        int msec = atoi(this->_cmd_args[1].data());
+        int msec = atoi(this->_cmd_args[1].data());  // データ送信間隔を設定
+
+        // グラフ表示設定を送信
+        this->_stream->print("conf=0:PID Input,0:PID Target,1:Integral,2:Term P,2:Term I,2:Term D,3:Motor Output");
+        this->_send_br();
 
         while(1){
-            if(this->_tool_mode){
-                this->_stream->printf(
-                    "%d,%d,%.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
-                );
-            }else{
-                this->_stream->printf(
-                    "pid: %d, %d, %.4f", g_pid_boom.get_in(), g_pid_boom.get_target(), g_motor_output[0]
-                );
-            }
+            if(!this->_tool_mode){ this->_stream->write("pid: "); }
+            this->_stream->printf(
+                "%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f",
+                g_pid_boom.get_in(), g_pid_boom.get_target(),
+                g_pid_boom.get_integral(),
+                g_pid_boom.get_term_p(), g_pid_boom.get_term_i(), g_pid_boom.get_term_d(), g_motor_output[0]
+            );
             this->_send_br();
 
             vTaskDelay(pdMS_TO_TICKS(msec));
