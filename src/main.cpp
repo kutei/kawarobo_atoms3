@@ -62,9 +62,9 @@ void setup() {
     g_motor_boom.begin(38, 0, 1.0, -1.0, true);
     g_motor_roll.begin(39, 1);
     g_pid_boom.begin(
-        /* Kp           */ 0.65,
+        /* Kp           */ 1.5,
         /* Ki           */ 0.0,
-        /* Kd           */ 0.02,
+        /* Kd           */ 0.05,
         /* dt           */ 0.005,
         /* max Integral */ 0.0,
         /* Target MAX   */ 28500,

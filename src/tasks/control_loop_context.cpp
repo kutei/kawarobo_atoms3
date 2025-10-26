@@ -157,7 +157,7 @@ void ControlLoopContext::onExecute()
         }else if(g_control_status == ControlStatus::CSTAT_ROLLING){
             this->_blender.selectIndex(4, 0.1);
         }else if(g_control_status == ControlStatus::CSTAT_FALLRECOVERY){
-            this->_blender.selectIndex(5, 0.01);
+            this->_blender.selectIndex(5, 0.05);
         }
     }
     g_pid_boom.set_target(this->_blender.get_blended());
