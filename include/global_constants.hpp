@@ -16,7 +16,8 @@
 #define ROLL_ADJ_INPUT_MAX 0.6          // ロール入力で調整中と判定する最大入力値
 #define ROLL_ADJ_SPEED 0.15             // ロール入力で調整するときの速度
 #define ROLL_ROLLING_SPEED 1.0          // ロール入力で回転するときの速度
-#define UNSLEEP_MOVE_SQRT_THRESHOLD 0.1 // スリープ解除するための移動入力量の閾値
+#define ROLL_PULLOUT_SPEED (-0.25)    // 転倒回復時に抜けやすくするためのロール速度
+#define UNSLEEP_MOVE_SQRT_THRESHOLD 0.1         // スリープ解除するための移動入力量の閾値
 #define BOOM_UP_MOVE_SQRT_THRESHOLD 0.45            // ブームアップするための移動入力量の閾値
 #define BOOM_UP_MOVE_SQRT_THRESHOLD_TRIM_WIDTH 0.30 // ブームアップするための移動入力量の閾値
 #define BOOM_NORMAL_POSITION 2000               // 通常モードのブーム位置
@@ -26,7 +27,7 @@
 #define BOOM_UP_STICK_SENSITIVITY 0         // ブームアップモードのブームのスティック感度
 #define BOOM_ROLLING_POSITION -1500         // ブームローリングモードのブーム位置
 #define BOOM_ROLLING_STICK_SENSITIVITY 2900 // ブームローリングモードのブームのスティック感度
-#define BOOM_STARTING_POSITION 28500        // スタート姿勢のブーム位置
+#define BOOM_STARTING_POSITION 28300        // スタート姿勢のブーム位置
 #define BOOM_FALLRECOVERY_POSITION 26000    // 転倒回復姿勢のブーム位置
 #define BOOM_FALLRECOVERY_JOYSTICK_THRESHOLD 0.98 // 転倒回復のジョイスティックの閾値
 

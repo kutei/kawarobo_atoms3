@@ -17,6 +17,9 @@ float conv_sbus2_to_float(uint16_t val, int16_t offset = 0, bool invert = false)
 
 void ControlLoopContext::onExecute()
 {
+    float roll_output = 0.0;
+    float boom_output = 0.0;
+
     if(!g_control_loop_active) return;
 
     //////////////////////////////////////////////////////////////
@@ -91,7 +94,6 @@ void ControlLoopContext::onExecute()
     bool roll_attaking = false;
     float roll_input = g_sbus2_ch[0];
     float roll_input_abs = fabs(roll_input);
-    float roll_output = 0.0;
     if(g_robot_status == RobotStatus::RSTAT_STARTING_POSE){
         if(roll_input_abs < ROLL_DEADZONE){
             roll_output = 0.0;
@@ -120,10 +122,6 @@ void ControlLoopContext::onExecute()
             roll_output = ROLL_ADJ_SPEED;
         }
     }
-
-    // roll出力をモーターに出力
-    g_motor_roll.out(roll_output);
-    g_motor_output[1] = roll_output;
 
 
     //////////////////////////////////////////////////////////////
@@ -158,11 +156,24 @@ void ControlLoopContext::onExecute()
             this->_blender.selectIndex(4, 0.1);
         }else if(g_control_status == ControlStatus::CSTAT_FALLRECOVERY){
             this->_blender.selectIndex(5, 0.05);
+            // 抜けやすいようにrollを回しておく
+            roll_output = ROLL_PULLOUT_SPEED;
         }
     }
     g_pid_boom.set_target(this->_blender.get_blended());
     int32_t out = g_pid_boom.step(g_enc_boom.get_angle());
-    float boom_output = out / 6000.0;
+    boom_output = out / 6000.0;
+
+
+    //////////////////////////////////////////////////////////////
+    // 出力を設定する
+    //////////////////////////////////////////////////////////////
+
+    // roll出力をモーターに出力
+    g_motor_roll.out(roll_output);
+    g_motor_output[1] = roll_output;
+
+    // boom出力をモーターに出力
     g_motor_boom.out(boom_output);
     g_motor_output[0] = boom_output;
 }
