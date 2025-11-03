@@ -80,6 +80,7 @@ public:
 
 private:
     ValueBlender<int32_t, 6> _blender;
+    unsigned long _prev_exec_time = 0;
 };
 
 

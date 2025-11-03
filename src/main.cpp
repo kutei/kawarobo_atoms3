@@ -39,6 +39,10 @@ void setup() {
     // 定数を計算
     calculate_global_constants();
 
+    // IMUとフィルターを有効化/初期化
+    M5.Imu.begin();
+    g_imu_filter.begin(200.0f); // サンプリング周波数200Hzで初期化
+
     // デバッグ用シリアルポートを初期化
     Serial.begin(921600);
 
@@ -133,7 +137,7 @@ void setup() {
             .repeated       = pdTRUE,
             .period         = pdMS_TO_TICKS(100),
             .initial        = pdMS_TO_TICKS(0),
-            .stack_size     = 1024,
+            .stack_size     = 2048,
             .priority       = 5,
             .core_id        = APP_CPU_NUM,
         })

@@ -54,6 +54,9 @@ void UpdateLcdContext::onExecute()
     this->_disp->setCursor(0, 0);
     this->_disp->printf("robot status: %d\n", g_robot_status);
     this->_disp->printf("control status: %d\n", g_control_status);
+    this->_disp->printf("exec_time: %04lu [us]\n", g_control_loop_time.exec_time);
+    this->_disp->printf("interval : %04lu [us]\n", g_control_loop_time.interval_time);
+    this->_disp->printf("IMU 3-axis: \n  %.2f\n  %.2f\n  %.2f\n", g_imu_euler_angle.roll, g_imu_euler_angle.pitch, g_imu_euler_angle.yaw);
 
     // core1カウンタの状態でチラつく四角形を表示
     if(g_core1_alive_count % 2 == 0){

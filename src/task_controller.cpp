@@ -12,14 +12,22 @@ AbstractRtosTaskContext::AbstractRtosTaskContext(RtosTaskConfigSharedPtr config)
 static void task_executer(void *param){
     auto task_context = (AbstractRtosTaskContextRawPtr)param;
     auto conf = task_context->getConfig();
+    TickType_t sleep_time;
 
     // 初期delayを実行
     if(conf->initial != 0) vTaskDelay(conf->initial);
 
     for(;;){
+        task_context->onExecutePre();
         task_context->onExecute();
+
         if(conf->repeated != pdTRUE) break;
-        vTaskDelay(conf->period);
+
+        sleep_time = conf->period - pdMS_TO_TICKS((task_context->getElapsedUs() + 500) / 1000);  // 四捨五入されるように500を加算
+        if(sleep_time < 0) sleep_time = 0;
+        if(sleep_time > conf->period) sleep_time = conf->period;
+
+        vTaskDelay(sleep_time);
     }
 
     vTaskDelete(conf->thand);

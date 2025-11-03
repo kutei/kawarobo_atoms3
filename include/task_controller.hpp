@@ -1,6 +1,8 @@
 #ifndef __INCLUDE_MAIN_TAKS_CONTROLLER_HPP
 #define __INCLUDE_MAIN_TAKS_CONTROLLER_HPP
 
+#include <M5Unified.h>
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
 
@@ -30,10 +32,13 @@ public:
     inline void setStarted(bool started) { this->_is_started = started; };
     virtual void onActivated() {};
     virtual void onExecute() = 0;
+    void onExecutePre() { _start_time = micros(); }
+    unsigned long getElapsedUs() { return micros() - _start_time; }
 
 private:
     RtosTaskConfigSharedPtr _config;
     bool _is_started;
+    unsigned long _start_time;
 };
 
 using AbstractRtosTaskContextRawPtr = AbstractRtosTaskContext *;

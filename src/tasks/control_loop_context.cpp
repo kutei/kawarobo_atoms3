@@ -19,8 +19,32 @@ void ControlLoopContext::onExecute()
 {
     float roll_output = 0.0;
     float boom_output = 0.0;
+    unsigned long start_time = micros();
 
-    if(!g_control_loop_active) return;
+    // 制御ループの実行時間と間隔時間を記録
+    unsigned long interval = start_time - this->_prev_exec_time;
+    this->_prev_exec_time = start_time;
+
+    //////////////////////////////////////////////////////////////
+    // IMUの更新
+    //////////////////////////////////////////////////////////////
+    float ax, ay, az;
+    float gx, gy, gz;
+    M5.Imu.getAccelData(&ax, &ay, &az);
+    M5.Imu.getGyroData(&gx, &gy, &gz);
+    g_imu_filter.updateIMU(gx, gy, gz, ax, ay, az);
+    g_imu_euler_angle.roll = g_imu_filter.getRoll();
+    g_imu_euler_angle.pitch = g_imu_filter.getPitch();
+    g_imu_euler_angle.yaw = g_imu_filter.getYaw();
+
+    //////////////////////////////////////////////////////////////
+    // 制御ループが無効化されていたら、ここで終了
+    //////////////////////////////////////////////////////////////
+    if(!g_control_loop_active) {
+        g_control_loop_time.exec_time = micros() - start_time;
+        g_control_loop_time.interval_time = interval;
+        return;
+    }
 
     //////////////////////////////////////////////////////////////
     // 入力取得と状態遷移
@@ -82,6 +106,9 @@ void ControlLoopContext::onExecute()
         g_motor_roll.out(0.0);
 
         g_pid_boom.reset();
+
+        g_control_loop_time.exec_time = micros() - start_time;
+        g_control_loop_time.interval_time = interval;
         return;
     }
 
@@ -176,4 +203,8 @@ void ControlLoopContext::onExecute()
     // boom出力をモーターに出力
     g_motor_boom.out(boom_output);
     g_motor_output[0] = boom_output;
+
+    g_control_loop_time.exec_time = micros() - start_time;
+    g_control_loop_time.interval_time = interval;
+    return;
 }

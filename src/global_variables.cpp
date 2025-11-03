@@ -11,6 +11,7 @@
 #include "peripherals/pwm_out.hpp"
 #include "peripherals/enc_reciever.hpp"
 
+#include <MadgwickAHRS.h>
 #include <Sbus2Reciever.hpp>
 #include <atomic>
 
@@ -35,8 +36,12 @@ float g_motor_output[2] = { 0.0 };
 float g_movement_power_square = 0.0;
 float g_digital_trim[2] = { 0.0 };
 
+Madgwick g_imu_filter;
+ImuEulerAngle g_imu_euler_angle;
+
 uint32_t g_start_pose_sleep_counter = 0;
 std::atomic<bool> g_control_loop_active(true);
+ControlTimeLog g_control_loop_time = {0, 0};
 
 
 /**********************************************************************

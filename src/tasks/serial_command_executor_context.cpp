@@ -167,6 +167,33 @@ void SerialCommandExecutorContext::_execute_command()
             }
         }
         return;
+    }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "t") == 0){
+        int msec = atoi(this->_cmd_args[1].data());  // データ送信間隔を設定
+
+        // グラフ表示設定を送信
+        this->_stream->print("conf=0:Control Time,0:Elapsed");
+        this->_send_br();
+
+        while(1){
+            if(!this->_tool_mode){ this->_stream->write("time: "); }
+            this->_stream->printf(
+                "%d,%d",
+                g_control_loop_time.exec_time, g_control_loop_time.interval_time
+            );
+            this->_send_br();
+
+            vTaskDelay(pdMS_TO_TICKS(msec));
+
+            if(this->_stream->available() > 0){
+                char c = this->_stream->read();
+                if(this->_is_kill_char(c)) {
+                    this->_stream->print("^C");
+                    this->_send_br();
+                    break;
+                }
+            }
+        }
+        return;
     }else if(strcmp(const_cast<const char *>(this->_cmd_args[0].data()), "mot") == 0){
         double v_boom = atof(this->_cmd_args[1].data());
         double v_roll = atof(this->_cmd_args[2].data());
