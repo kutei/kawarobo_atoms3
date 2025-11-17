@@ -57,6 +57,7 @@ void UpdateLcdContext::onExecute()
     this->_disp->printf("exec_time: %04lu [us]\n", g_control_loop_time.exec_time);
     this->_disp->printf("interval : %04lu [us]\n", g_control_loop_time.interval_time);
     this->_disp->printf("IMU 3-axis: \n  %.2f\n  %.2f\n  %.2f\n", g_imu_euler_angle.roll, g_imu_euler_angle.pitch, g_imu_euler_angle.yaw);
+    this->_disp->printf("imu interval: %.2f [ms]\n", g_imu_calc_time.interval_time/1000.0);
 
     // core1カウンタの状態でチラつく四角形を表示
     if(g_core1_alive_count % 2 == 0){

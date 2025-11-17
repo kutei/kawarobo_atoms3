@@ -26,18 +26,6 @@ void ControlLoopContext::onExecute()
     this->_prev_exec_time = start_time;
 
     //////////////////////////////////////////////////////////////
-    // IMUの更新
-    //////////////////////////////////////////////////////////////
-    float ax, ay, az;
-    float gx, gy, gz;
-    M5.Imu.getAccelData(&ax, &ay, &az);
-    M5.Imu.getGyroData(&gx, &gy, &gz);
-    g_imu_filter.updateIMU(gx, gy, gz, ax, ay, az);
-    g_imu_euler_angle.roll = g_imu_filter.getRoll();
-    g_imu_euler_angle.pitch = g_imu_filter.getPitch();
-    g_imu_euler_angle.yaw = g_imu_filter.getYaw();
-
-    //////////////////////////////////////////////////////////////
     // 制御ループが無効化されていたら、ここで終了
     //////////////////////////////////////////////////////////////
     if(!g_control_loop_active) {

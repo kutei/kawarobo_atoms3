@@ -5,6 +5,7 @@
 #include "tasks/parse_serials_context.hpp"
 #include "tasks/serial_command_executor_context.hpp"
 #include "tasks/control_loop_context.hpp"
+#include "tasks/imu_calc_context.hpp"
 #include "tasks/update_lcd_context.hpp"
 #include "peripherals/pwm_out.hpp"
 #include "peripherals/enc_reciever.hpp"
@@ -19,7 +20,7 @@
 /**********************************************************************
  * Constants, macros and in-file global variables
  *********************************************************************/
-#define NUMBER_OF_TASKS 5   // タスクの数
+#define NUMBER_OF_TASKS 6   // タスクの数
 static std::array<AbstractRtosTaskContextSharedPtr, NUMBER_OF_TASKS> task_configs;
 
 
@@ -28,6 +29,8 @@ static std::array<AbstractRtosTaskContextSharedPtr, NUMBER_OF_TASKS> task_config
  * intialize and loop
  *********************************************************************/
 void setup() {
+    g_initialized = false;
+
     // M5Unifiedの初期化
     auto cfg = M5.config();
     M5.begin(cfg);
@@ -41,7 +44,7 @@ void setup() {
 
     // IMUとフィルターを有効化/初期化
     M5.Imu.begin();
-    g_imu_filter.begin(200.0f); // サンプリング周波数200Hzで初期化
+    g_imu_filter.begin(200.0f); // サンプリング周波数100Hzで初期化
 
     // デバッグ用シリアルポートを初期化
     Serial.begin(921600);
@@ -102,7 +105,20 @@ void setup() {
         }),
         &Serial
     );
-    task_configs[2] = std::make_shared<ControlLoopContext>(
+    task_configs[2] = std::make_shared<ImuCalcContext>(
+        std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
+            .start_required = true,
+            .name           = "task_imu_calc",
+            .thand          = NULL,
+            .repeated       = pdTRUE,
+            .period         = pdMS_TO_TICKS(5),
+            .initial        = pdMS_TO_TICKS(0),
+            .stack_size     = 4096,
+            .priority       = 1,
+            .core_id        = PRO_CPU_NUM,
+        })
+    );
+    task_configs[3] = std::make_shared<ControlLoopContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
             .start_required = true,
             .name           = "task_control_loop",
@@ -115,7 +131,7 @@ void setup() {
             .core_id        = APP_CPU_NUM,
         })
     );
-    task_configs[3] = std::make_shared<UpdateLcdContext>(
+    task_configs[4] = std::make_shared<UpdateLcdContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
             .start_required = true,
             .name           = "task_update_lcd_context",
@@ -129,7 +145,7 @@ void setup() {
         }),
         &M5.Display
     );
-    task_configs[4] = std::make_shared<Core1CounterContext>(
+    task_configs[5] = std::make_shared<Core1CounterContext>(
         std::make_shared<RtosTaskConfig_typedef>(RtosTaskConfig_typedef{
             .start_required = true,
             .name           = "task_core1_counter",
@@ -166,6 +182,7 @@ void setup() {
     M5.Display.print(" >ok\n");
 
     // SBUS2データを正常受信するまで待機
+    /*
     M5.Display.print("waiting sbus2");
     while(g_sbus2.isLostframe() == true){
         vTaskDelay(pdMS_TO_TICKS(50));
@@ -197,9 +214,11 @@ void setup() {
         }
         g_motor_boom.out(0);
     }
+    */
     M5.Display.print("\n  -> done!\n");
 
     // 制御開始
+    g_initialized = true;
     g_robot_status = RobotStatus::RSTAT_SLEEPING;
 }
 

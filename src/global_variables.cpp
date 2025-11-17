@@ -28,6 +28,7 @@ PidController g_pid_boom;
 
 std::atomic<int> g_core1_alive_count(0);
 
+std::atomic<bool> g_initialized(false);
 enum RobotStatus g_robot_status = RobotStatus::RSTAT_WAITING_STABILIZED;
 enum ControlStatus g_control_status = ControlStatus::CSTAT_NORMAL;
 
@@ -42,6 +43,7 @@ ImuEulerAngle g_imu_euler_angle;
 uint32_t g_start_pose_sleep_counter = 0;
 std::atomic<bool> g_control_loop_active(true);
 ControlTimeLog g_control_loop_time = {0, 0};
+ControlTimeLog g_imu_calc_time = {0, 0};
 
 
 /**********************************************************************
