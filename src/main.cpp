@@ -42,6 +42,9 @@ void setup() {
     // 定数を計算
     calculate_global_constants();
 
+    // 制御設定用のユーザボタンを設定
+    M5.BtnA.setHoldThresh(USER_BTN_LONG_PRESS_MS);
+
     // IMUとフィルターを有効化/初期化
     M5.Imu.begin();
     g_imu_filter.begin(200.0f); // サンプリング周波数100Hzで初期化
@@ -182,7 +185,6 @@ void setup() {
     M5.Display.print(" >ok\n");
 
     // SBUS2データを正常受信するまで待機
-    /*
     M5.Display.print("waiting sbus2");
     while(g_sbus2.isLostframe() == true){
         vTaskDelay(pdMS_TO_TICKS(50));
@@ -214,7 +216,6 @@ void setup() {
         }
         g_motor_boom.out(0);
     }
-    */
     M5.Display.print("\n  -> done!\n");
 
     // 制御開始
@@ -225,5 +226,6 @@ void setup() {
 
 
 void loop() {
-    vTaskDelay(1000);
+    M5.update();
+    vTaskDelay(50);
 }

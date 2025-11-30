@@ -10,6 +10,7 @@
 #define LOOP_ALIVE_COUNT_THRESHOLD 50          // ループが正常に実行され始めていると判定するための閾値
 #define SLEEP_BUTTON_START_POSE_THRESHOLD 500  // スリープボタンでスタート姿勢用長押ししたと判定するための閾値
 #define SLEEP_BUTTON_SLEEP_THRESHOLD 1000       // スリープボタンでスリープ用長押ししたと判定するための閾値
+#define USER_BTN_LONG_PRESS_MS 1000             // 制御設定用ボタンの長押し時間閾値(ms)
 
 // ロボット動作パラメータ系
 #define ROLL_DEADZONE 0.15              // ロール入力のデッドゾーン

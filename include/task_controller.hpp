@@ -26,7 +26,9 @@ using RtosTaskConfigSharedPtr = std::shared_ptr<RtosTaskConfig_typedef>;
 class AbstractRtosTaskContext{
 public:
     AbstractRtosTaskContext(RtosTaskConfigSharedPtr config);
+    AbstractRtosTaskContext();
 
+    inline void setConfig(RtosTaskConfigSharedPtr config) { this->_config = std::move(config); };
     inline RtosTaskConfigSharedPtr getConfig() { return this->_config; };
     inline bool isStarted() { return this->_is_started; };
     inline void setStarted(bool started) { this->_is_started = started; };

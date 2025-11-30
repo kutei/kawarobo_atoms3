@@ -45,6 +45,8 @@ std::atomic<bool> g_control_loop_active(true);
 ControlTimeLog g_control_loop_time = {0, 0};
 ControlTimeLog g_imu_calc_time = {0, 0};
 
+std::atomic<bool> g_is_display_required_task_running(false);
+
 
 /**********************************************************************
  * Initialize Function
