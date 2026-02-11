@@ -175,6 +175,11 @@ void ControlLoopContext::onExecute()
             roll_output = ROLL_PULLOUT_SPEED;
         }
     }
+    if(this->_blender.getRatio(2) > 0.5){ // NORMALモードならIMUの値を反映して安定化
+        float imu_roll_angle = g_imu_euler_angle.pitch;
+        int32_t imu_roll_target = (int32_t)(imu_roll_angle * IMU_ROLL_ANGLE_TO_ENCODER_CNT);
+        this->_blender.setValues(2, imu_roll_target);
+    }
     g_pid_boom.set_target(this->_blender.get_blended());
     int32_t out = g_pid_boom.step(g_enc_boom.get_angle());
     boom_output = out / 6000.0;

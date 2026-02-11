@@ -64,6 +64,10 @@ public:
         return result;
     }
 
+    float getRatio(std::size_t index) {
+        return this->_blends[index];
+    }
+
 private:
     std::array<T, N> _values;
     std::array<float, N> _blends;

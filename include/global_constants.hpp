@@ -31,6 +31,8 @@
 #define BOOM_STARTING_POSITION 28300        // スタート姿勢のブーム位置
 #define BOOM_FALLRECOVERY_POSITION 26000    // 転倒回復姿勢のブーム位置
 #define BOOM_FALLRECOVERY_JOYSTICK_THRESHOLD 0.98 // 転倒回復のジョイスティックの閾値
+#define IMU_ROLL_ANGLE_TO_ENCODER_CNT 1000.0f // IMUのロール角度からエンコーダカウントへの変換係数
+
 
 
 
